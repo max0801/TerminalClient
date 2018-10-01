@@ -21,4 +21,8 @@ public interface ChunkService {
     @GET("/chunklist?nid={nid}")
     Call<List<String>> chunkList(@Path("nid") int nodeID);
 
+    @GET("/chunkdump?cid={cid}?=name={name}")
+    Call<List<String>> chunkDump(@Path("cid") int chunkID, @Path("name") String name);
+
+
 }

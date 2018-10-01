@@ -7,7 +7,7 @@ import retrofit2.Retrofit;
 
 @CommandLine.Command(
         name = "chunkget",
-        description = "Requests a Chunk with id <cid> and type <type>"
+        description = "requests a chunk with id <cid> and type <type>"
 )
 public class ChunkGet extends AbstractCommand implements Runnable {
     @CommandLine.Option(

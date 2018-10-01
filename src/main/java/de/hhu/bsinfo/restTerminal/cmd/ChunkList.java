@@ -6,14 +6,14 @@ import picocli.CommandLine;
 
 @CommandLine.Command(
         name = "chunklist",
-        description = "List all Chunks on Node with <nid>"
+        description = "list all chunks on node <nid>"
 )
 public class ChunkList extends AbstractCommand implements Runnable {
     @CommandLine.Option(
             names = {"-n","--nid"},
             required = true,
             paramLabel = "NID",
-            description = "The node ID where the list of chunks is referring to")
+            description = "The node <nid> where the list of chunks is referring to")
     private int nid;
     private ChunkService chunkService;
 
@@ -21,7 +21,7 @@ public class ChunkList extends AbstractCommand implements Runnable {
     public void run() {
         //REST-Server is not set up yet
         //chunkService = retrofit.create(ChunkService.class);
-        //chunkService.chunkCreate(nid,size);
+        //chunkService.chunkList(nid);
         System.out.println("list of all Chunks on NID "+nid);
     }
 }

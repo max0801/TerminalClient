@@ -7,18 +7,18 @@ import retrofit2.Retrofit;
 
 @CommandLine.Command(
         name = "chunkcreate",
-        description = "Creates a Chunk on Node <nid> with Size <size>"
+        description = "creates a chunk on node <nid> with size <size>"
 )
 public class ChunkCreate extends AbstractCommand implements Runnable {
     @CommandLine.Option(
             names = {"-n","--nid"},
             required = true,
             paramLabel = "NID",
-            description = "node ID of dxram peer where the chunk is created")
+            description = "chunk id of the created chunk")
     private int nid;
     @CommandLine.Option(
             names = {"-s", "--size"},
-            paramLabel = "chunkSize",
+            paramLabel = "SIZE",
             description = "size of the created chunk in byte")
     private int size = 16;
     private ChunkService chunkService;
