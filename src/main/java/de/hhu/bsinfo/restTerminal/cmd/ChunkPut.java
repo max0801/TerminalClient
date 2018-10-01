@@ -3,23 +3,29 @@ package de.hhu.bsinfo.restTerminal.cmd;
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
 import de.hhu.bsinfo.restTerminal.rest.ChunkService;
 import picocli.CommandLine;
-import retrofit2.Retrofit;
 
 @CommandLine.Command(
-        name = "chunkget",
-        description = "Requests a Chunk with id <cid> and type <type>"
+        name = "chunkput",
+        description = "Put <data> with <type> on Chunk with <cid>"
 )
-public class ChunkGet extends AbstractCommand implements Runnable {
+public class ChunkPut extends AbstractCommand implements Runnable {
     @CommandLine.Option(
             names = {"-c","--cid"},
             required = true,
             paramLabel = "CID",
-            description = "chunk ID of the requested chunk")
+            description = "Chunk ID where the chunk is put")
     private int cid;
+    @CommandLine.Option(
+            names = {"-d", "--data"},
+            required = true,
+            paramLabel = "DATA",
+            description = "data that is put on the chunk")
+    private Object data;
+
     @CommandLine.Option(
             names = {"-t", "--type"},
             paramLabel = "TYPE",
-            description = "type of the requested chunk [str,byte,short,int,long]")
+            description = "type of the put chunk [str,byte,short,int,long]")
     private String type = "str";
     private ChunkService chunkService;
 
@@ -27,9 +33,7 @@ public class ChunkGet extends AbstractCommand implements Runnable {
     public void run() {
         //REST-Server is not set up yet
         //chunkService = retrofit.create(ChunkService.class);
-        //chunkService.chunkGet(cid,type);
-        System.out.println("requested Chunk on Node "+cid+" with type "+type);
-
+        //chunkService.chunkCreate(nid,size);
+        System.out.println("put Chunk on Chunk with id "+cid+" with type "+type+" with data"+data);
     }
 }
-
