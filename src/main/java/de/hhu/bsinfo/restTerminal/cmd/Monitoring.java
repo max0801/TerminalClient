@@ -2,29 +2,43 @@ package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
 import de.hhu.bsinfo.restTerminal.rest.MonitoringService;
-import de.hhu.bsinfo.restTerminal.rest.NameService;
-import picocli.CommandLine;
+import org.springframework.shell.standard.ShellComponent;
+import org.springframework.shell.standard.ShellMethod;
+import org.springframework.shell.standard.ShellOption;
 
-@CommandLine.Command(
-        name = "monitor",
-        description = "gets monitoring data from node <nid>"
-)
-public class Monitoring extends AbstractCommand implements Runnable {
+
+@ShellComponent
+public class Monitoring extends AbstractCommand{
     private MonitoringService monitoringService;
 
-    @CommandLine.Option(
-            names = {"-n", "--nid"},
-            required = true,
-            paramLabel = "NID",
-            description = "node <nid> which is monitored")
-    private int nid;
+    @ShellMethod("gets monitoring data from node <nid>")
+    public void monitor(@ShellOption(value = {"--nid", "-n"}, help = "node <nid> which is monitored") int nid) {
 
-    @Override
-    public void run() {
-        //REST-Server is not set up yet
-        //monitoringService = retrofit.create(MonitoringService.class);
-        //monitoringService.monitor(nid);
         System.out.println("got monitor data from Node " + nid);
+
+        /*
+        //chunkService = retrofit.create(ChunkService.class);
+        //chunkService.chunkGet(cid,type);
+        Call<String> call = chunkService.chunkDump(cid, filename);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if(APIError.isError(response.body())){
+                    APIError error = ErrorUtils.parseError(response);
+                    error.printError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                System.out.println("Something else happenend");
+            }
+        });*/
     }
+
+
 }
+
+
+
 

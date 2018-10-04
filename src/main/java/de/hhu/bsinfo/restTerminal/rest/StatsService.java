@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface StatsService {
     @GET("/statsprint?interval={interval}")
-    Call<List<String>> printStats(@Path("interval") int intervalInSeconds);
+    Call<String> printStats(@Path("interval") int intervalInSeconds);
 }

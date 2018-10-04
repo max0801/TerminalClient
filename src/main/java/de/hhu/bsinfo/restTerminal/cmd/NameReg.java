@@ -2,33 +2,44 @@ package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
 import de.hhu.bsinfo.restTerminal.rest.NameService;
-import picocli.CommandLine;
+import org.springframework.shell.standard.ShellComponent;
+import org.springframework.shell.standard.ShellMethod;
+import org.springframework.shell.standard.ShellOption;
 
-@CommandLine.Command(
-        name = "namereg",
-        description = "register chunk <cid> with <name>"
-)
-public class NameReg extends AbstractCommand implements Runnable {
+
+@ShellComponent
+public class NameReg extends AbstractCommand{
     private NameService nameService;
 
-    @CommandLine.Option(
-            names = {"-c","--cid"},
-            required = true,
-            paramLabel = "CID",
-            description = "chunk <cid> which is named")
-    private int cid;
-    @CommandLine.Option(
-            names = {"-n", "--name"},
-            required = true,
-            paramLabel = "NAME",
-            description = "name of the chunk")
-    private String name ;
+    @ShellMethod("register chunk <cid> with <name>")
+    public void namereg(@ShellOption(value = {"--cid", "-c"}, help = "chunk <cid> which is named") int cid,
+                         @ShellOption(value = {"--name", "-n"}, help = "name of the chunk") String name) {
 
-    @Override
-    public void run() {
-        //REST-Server is not set up yet
-        //nameService = retrofit.create(NameService.class);
-        //nameService.nameReg();
         System.out.println("named chunk "+ cid+ " to "+name);
+
+        /*
+        //chunkService = retrofit.create(ChunkService.class);
+        //chunkService.chunkGet(cid,type);
+        Call<String> call = chunkService.chunkDump(cid, filename);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if(APIError.isError(response.body())){
+                    APIError error = ErrorUtils.parseError(response);
+                    error.printError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                System.out.println("Something else happenend");
+            }
+        });*/
     }
+
+
 }
+
+
+
+

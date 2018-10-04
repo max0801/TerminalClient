@@ -2,34 +2,42 @@ package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
 import de.hhu.bsinfo.restTerminal.rest.ChunkService;
-import picocli.CommandLine;
-import retrofit2.Retrofit;
+import org.springframework.shell.standard.ShellComponent;
+import org.springframework.shell.standard.ShellMethod;
+import org.springframework.shell.standard.ShellOption;
 
-@CommandLine.Command(
-        name = "chunkget",
-        description = "requests a chunk with id <cid> and type <type>"
-)
-public class ChunkGet extends AbstractCommand implements Runnable {
-    @CommandLine.Option(
-            names = {"-c","--cid"},
-            required = true,
-            paramLabel = "CID",
-            description = "chunk ID of the requested chunk")
-    private int cid;
-    @CommandLine.Option(
-            names = {"-t", "--type"},
-            paramLabel = "TYPE",
-            description = "type of the requested chunk [str,byte,short,int,long]")
-    private String type = "str";
+
+@ShellComponent
+public class ChunkGet extends AbstractCommand{
     private ChunkService chunkService;
 
-    @Override
-    public void run() {
-        //REST-Server is not set up yet
-        //chunkService = retrofit.create(ChunkService.class);
-        //chunkService.chunkGet(cid,type);
+    @ShellMethod("requests a chunk with id <cid> and type <type>")
+    public void chunkget(@ShellOption(value = {"--cid", "-c"}, help = "chunk ID of the requested chunk") int cid,
+                          @ShellOption(value = {"--type","-t"}, defaultValue = "str",
+                                  help ="type of the requested chunk [str,byte,short,int,long]" ) String type){
+
         System.out.println("requested Chunk on Node "+cid+" with type "+type);
 
+        /*
+        //chunkService = retrofit.create(ChunkService.class);
+        //chunkService.chunkGet(cid,type);
+        Call<String> call = chunkService.chunkDump(cid, filename);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if(APIError.isError(response.body())){
+                    APIError error = ErrorUtils.parseError(response);
+                    error.printError();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                System.out.println("Something else happenend");
+            }
+        });*/
     }
+
+
 }
 
