@@ -8,15 +8,18 @@ import org.springframework.shell.standard.ShellOption;
 
 
 @ShellComponent
-public class ChunkGet extends AbstractCommand{
-    private ChunkService chunkService;
+public class ChunkGet extends AbstractCommand {
+    private ChunkService chunkService = retrofit.create(ChunkService.class);
 
-    @ShellMethod("requests a chunk with id <cid> and type <type>")
-    public void chunkget(@ShellOption(value = {"--cid", "-c"}, help = "chunk ID of the requested chunk") int cid,
-                          @ShellOption(value = {"--type","-t"}, defaultValue = "str",
-                                  help ="type of the requested chunk [str,byte,short,int,long]" ) String type){
+    @ShellMethod(value = "requests a chunk with id <cid> and type <type>", group = "Chunk Commands")
+    public void chunkget(
+            @ShellOption(value = {"--cid", "-c"}, help = "chunk ID of the requested chunk") int cid,
+            @ShellOption(value = {"--type", "-t"}, defaultValue = "str",
+                    help = "type of the requested chunk [str,byte,short,int,long]") String type,
+            @ShellOption(value = {"--print", "-p"}, help = "print chunk to stdout", defaultValue = "false") boolean print) {
 
-        System.out.println("requested Chunk on Node "+cid+" with type "+type);
+        System.out.println("requested Chunk on Node " + cid + " with type " + type);
+        System.out.println("print: " + print);
 
         /*
         //chunkService = retrofit.create(ChunkService.class);
@@ -36,6 +39,10 @@ public class ChunkGet extends AbstractCommand{
                 System.out.println("Something else happenend");
             }
         });*/
+
+        String response = "Chunk: 53454322304203894";
+        //SaveFile.saveFileToWorkingDirectory(response);
+
     }
 
 

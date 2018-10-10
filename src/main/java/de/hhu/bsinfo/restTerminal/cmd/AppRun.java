@@ -3,7 +3,7 @@ package de.hhu.bsinfo.restTerminal.cmd;
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
 import de.hhu.bsinfo.restTerminal.files.LogFileSaver;
-import de.hhu.bsinfo.restTerminal.rest.ChunkService;
+import de.hhu.bsinfo.restTerminal.rest.AppService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
@@ -16,21 +16,21 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 @ShellComponent
-public class ChunkCreate extends AbstractCommand implements LogFileSaver<String> {
-    private ChunkService chunkService = retrofit.create(ChunkService.class);
+public class AppRun extends AbstractCommand implements LogFileSaver<String> {
+    private AppService appService = retrofit.create(AppService.class);
     private int nid;
-    private int size;
+    private String appName;
     private static String ON_FAILURE_MESSAGE = "NO RESPONSE";
-    private static String FOLDER_PATH = "ChunkCreate"+File.separator ;
+    private static String FOLDER_PATH = "AppRun"+ File.separator ;
 
-    @ShellMethod(value = "creates a chunk on node <nid> with size <size>", group = "Chunk Commands")
-    public void chunkcreate(
-            @ShellOption(value = {"--nid", "-n"}, help = "Node <nid> of the created chunk") int nid,
-            @ShellOption(value = {"--size", "-s"}, defaultValue = "16",
-                    help = "size of the created chunk in byte") int size) {
+    @ShellMethod(value = "Start app on remote node", group = "App Commands")
+    public void apprun(
+            @ShellOption(value = {"--nid", "-n"}, help = "Node <nid> with all available applications") int nid,
+            @ShellOption(value = {"--app", "-a"}, help = "name of app that is supposed to be run") String appName) {
         this.nid = nid;
-        this.size = size;
-        String message = "created Chunk on Node " + nid + " with size " + size;
+        this.appName = appName;
+
+        String message = "App "+appName+ " is running on node "+nid;
         System.out.println(message);
         saveToLogFile(message);
 

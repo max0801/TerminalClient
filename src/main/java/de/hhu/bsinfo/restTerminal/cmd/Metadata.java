@@ -3,7 +3,8 @@ package de.hhu.bsinfo.restTerminal.cmd;
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
 import de.hhu.bsinfo.restTerminal.files.LogFileSaver;
-import de.hhu.bsinfo.restTerminal.rest.ChunkService;
+import de.hhu.bsinfo.restTerminal.rest.AppService;
+import de.hhu.bsinfo.restTerminal.rest.MetadataService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
@@ -16,21 +17,18 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 @ShellComponent
-public class ChunkCreate extends AbstractCommand implements LogFileSaver<String> {
-    private ChunkService chunkService = retrofit.create(ChunkService.class);
+public class Metadata extends AbstractCommand implements LogFileSaver<String> {
+    private MetadataService metadataService = retrofit.create(MetadataService.class);
     private int nid;
-    private int size;
     private static String ON_FAILURE_MESSAGE = "NO RESPONSE";
-    private static String FOLDER_PATH = "ChunkCreate"+File.separator ;
+    private static String FOLDER_PATH = "Metadata"+ File.separator ;
 
-    @ShellMethod(value = "creates a chunk on node <nid> with size <size>", group = "Chunk Commands")
-    public void chunkcreate(
-            @ShellOption(value = {"--nid", "-n"}, help = "Node <nid> of the created chunk") int nid,
-            @ShellOption(value = {"--size", "-s"}, defaultValue = "16",
-                    help = "size of the created chunk in byte") int size) {
+    @ShellMethod(value = "Get summary of all or one superper's metadata", group = "Metadata Commands")
+    public void metadata(
+            @ShellOption(value = {"--nid", "-n"}, defaultValue = "-1", help = "Node <nid> where the metadata is requested from") int nid) {
         this.nid = nid;
-        this.size = size;
-        String message = "created Chunk on Node " + nid + " with size " + size;
+        //TODO add functionality to distinguish between getting metadata from one or all peers
+        String message = "print metadata";
         System.out.println(message);
         saveToLogFile(message);
 

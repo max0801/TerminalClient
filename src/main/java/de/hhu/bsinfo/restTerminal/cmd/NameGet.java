@@ -3,7 +3,8 @@ package de.hhu.bsinfo.restTerminal.cmd;
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
 import de.hhu.bsinfo.restTerminal.files.LogFileSaver;
-import de.hhu.bsinfo.restTerminal.rest.ChunkService;
+import de.hhu.bsinfo.restTerminal.rest.AppService;
+import de.hhu.bsinfo.restTerminal.rest.NameService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
@@ -16,21 +17,17 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 @ShellComponent
-public class ChunkCreate extends AbstractCommand implements LogFileSaver<String> {
-    private ChunkService chunkService = retrofit.create(ChunkService.class);
-    private int nid;
-    private int size;
+public class NameGet extends AbstractCommand implements LogFileSaver<String> {
+    private NameService nameService = retrofit.create(NameService.class);
+    private String name;
     private static String ON_FAILURE_MESSAGE = "NO RESPONSE";
-    private static String FOLDER_PATH = "ChunkCreate"+File.separator ;
+    private static String FOLDER_PATH = "NameGet"+ File.separator ;
 
-    @ShellMethod(value = "creates a chunk on node <nid> with size <size>", group = "Chunk Commands")
-    public void chunkcreate(
-            @ShellOption(value = {"--nid", "-n"}, help = "Node <nid> of the created chunk") int nid,
-            @ShellOption(value = {"--size", "-s"}, defaultValue = "16",
-                    help = "size of the created chunk in byte") int size) {
-        this.nid = nid;
-        this.size = size;
-        String message = "created Chunk on Node " + nid + " with size " + size;
+    @ShellMethod(value = "Get chunk by name from nameservice", group = "Name Commands")
+    public void nameget(
+            @ShellOption(value = {"--name", "-n"}, help = "name of the chunk which is requested") String name) {
+        this.name = name;
+        String message = "print Chunk with name "+name;
         System.out.println(message);
         saveToLogFile(message);
 

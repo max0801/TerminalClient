@@ -7,14 +7,15 @@ import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 
 @ShellComponent
-public class ChunkList extends AbstractCommand{
-    private ChunkService chunkService;
+public class ChunkList extends AbstractCommand {
+    private ChunkService chunkService = retrofit.create(ChunkService.class);
 
-    @ShellMethod("list all chunks on node <nid>")
-    public void chunklist(@ShellOption(value = {"--nid", "-n"},
-            help = "The node <nid> where the list of chunks is referring to") int nid) {
+    @ShellMethod(value = "list all chunks on node <nid>", group = "Chunk Commands")
+    public void chunklist(
+            @ShellOption(value = {"--nid", "-n"}, help = "The node <nid> where the list of chunks is referring to") int nid,
+            @ShellOption(value = {"--print", "-p"}, help = "print chunklist to stdout", defaultValue = "false") boolean print) {
 
-        System.out.println("list of all Chunks on NID "+nid);
+        System.out.println("list of all Chunks on NID " + nid);
 
         /*
         //chunkService = retrofit.create(ChunkService.class);

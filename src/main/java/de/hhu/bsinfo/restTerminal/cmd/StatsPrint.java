@@ -1,7 +1,6 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.rest.NodeService;
 import de.hhu.bsinfo.restTerminal.rest.StatsService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -9,14 +8,16 @@ import org.springframework.shell.standard.ShellOption;
 
 
 @ShellComponent
-public class StatsPrint extends AbstractCommand{
-    private StatsService statsService;
+public class StatsPrint extends AbstractCommand {
+    private StatsService statsService = retrofit.create(StatsService.class);
 
-    @ShellMethod("get debug information every <interval> seconds")
-    public void statsprint(@ShellOption(value = {"--interval", "-i"}, defaultValue = "10",
-            help = "Refresh interval parameter in seconds") int interval) {
+    @ShellMethod(value = "get debug information every <interval> seconds", group = "Statistics Commands")
+    public void statsprint(
+            @ShellOption(value = {"--interval", "-i"}, defaultValue = "10", help = "Refresh interval parameter in seconds") int interval,
+            @ShellOption(value = {"--print", "-p"}, help = "print statistics to stdout",
+                    defaultValue = "false") boolean print) {
 
-        System.out.println("printing stats every "+ interval+" seconds");
+        System.out.println("printing stats every " + interval + " seconds");
 
         /*
         //chunkService = retrofit.create(ChunkService.class);

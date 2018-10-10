@@ -16,21 +16,18 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 @ShellComponent
-public class ChunkCreate extends AbstractCommand implements LogFileSaver<String> {
+public class ChunkRemove extends AbstractCommand implements LogFileSaver<String> {
     private ChunkService chunkService = retrofit.create(ChunkService.class);
-    private int nid;
-    private int size;
+    private int cid;
     private static String ON_FAILURE_MESSAGE = "NO RESPONSE";
-    private static String FOLDER_PATH = "ChunkCreate"+File.separator ;
+    private static String FOLDER_PATH = "ChunkRemove" + File.separator;
 
-    @ShellMethod(value = "creates a chunk on node <nid> with size <size>", group = "Chunk Commands")
-    public void chunkcreate(
-            @ShellOption(value = {"--nid", "-n"}, help = "Node <nid> of the created chunk") int nid,
-            @ShellOption(value = {"--size", "-s"}, defaultValue = "16",
-                    help = "size of the created chunk in byte") int size) {
-        this.nid = nid;
-        this.size = size;
-        String message = "created Chunk on Node " + nid + " with size " + size;
+    @ShellMethod(value = "Remove chunk with CID", group = "Chunk Commands")
+    public void chunkremove(
+            @ShellOption(value = {"--cid", "-c"}, help = "chunk that is supposed to be removed") int cid) {
+
+        this.cid = cid;
+        String message = "removed Chunk " + cid;
         System.out.println(message);
         saveToLogFile(message);
 
@@ -56,11 +53,11 @@ public class ChunkCreate extends AbstractCommand implements LogFileSaver<String>
 
 
     @Override
-    public void saveToLogFile(String chunkCreate) {
+    public void saveToLogFile(String chunkRemove) {
         try {
             String dateTime = FolderHierarchy.createDateTimeFolderHierarchy(ROOT_PATH + FOLDER_PATH, false);
             Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + dateTime + "log.txt");
-            Files.write(logFilePath, chunkCreate.getBytes(), StandardOpenOption.CREATE);
+            Files.write(logFilePath, chunkRemove.getBytes(), StandardOpenOption.CREATE);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);

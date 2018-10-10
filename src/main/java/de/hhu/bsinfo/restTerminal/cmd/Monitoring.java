@@ -8,11 +8,14 @@ import org.springframework.shell.standard.ShellOption;
 
 
 @ShellComponent
-public class Monitoring extends AbstractCommand{
-    private MonitoringService monitoringService;
+public class Monitoring extends AbstractCommand {
+    private MonitoringService monitoringService = retrofit.create(MonitoringService.class);
 
-    @ShellMethod("gets monitoring data from node <nid>")
-    public void monitor(@ShellOption(value = {"--nid", "-n"}, help = "node <nid> which is monitored") int nid) {
+    @ShellMethod(value = "gets monitoring data from node <nid>", group = "Monitoring Commands")
+    public void monitor(
+            @ShellOption(value = {"--nid", "-n"}, help = "node <nid> which is monitored") int nid,
+            @ShellOption(value = {"--print", "-p"}, help = "print monitoring data to stdout",
+                    defaultValue = "false") boolean print) {
 
         System.out.println("got monitor data from Node " + nid);
 

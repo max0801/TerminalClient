@@ -4,14 +4,17 @@ import de.hhu.bsinfo.restTerminal.AbstractCommand;
 import de.hhu.bsinfo.restTerminal.rest.NodeService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
+import org.springframework.shell.standard.ShellOption;
 
 
 @ShellComponent
-public class NodeList extends AbstractCommand{
-    private NodeService nodeService;
+public class NodeList extends AbstractCommand {
+    private NodeService nodeService = retrofit.create(NodeService.class);
 
-    @ShellMethod("get nodelist")
-    public void nodelist() {
+    @ShellMethod(value = "get nodelist", group = "Node Commands")
+    public void nodelist(
+            @ShellOption(value = {"--print", "-p"}, help = "print nodelist to stdout",
+                    defaultValue = "false") boolean print) {
 
         System.out.println("print the nodelist");
 

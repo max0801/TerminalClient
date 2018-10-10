@@ -4,14 +4,17 @@ import de.hhu.bsinfo.restTerminal.AbstractCommand;
 import de.hhu.bsinfo.restTerminal.rest.NameService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
+import org.springframework.shell.standard.ShellOption;
 
 
 @ShellComponent
-public class NameList extends AbstractCommand{
-    private NameService nameService;
+public class NameList extends AbstractCommand {
+    private NameService nameService = retrofit.create(NameService.class);
 
-    @ShellMethod("get namelist")
-    public void namelist() {
+    @ShellMethod(value = "get namelist", group = "Name Commands")
+    public void namelist(
+            @ShellOption(value = {"--print", "-p"}, help = "print namelist to stdout",
+                    defaultValue = "false") boolean print) {
 
         System.out.println("print the namelist");
 

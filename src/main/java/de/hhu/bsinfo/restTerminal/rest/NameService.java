@@ -15,5 +15,7 @@ public interface NameService  {
     @POST("/namereg?cid={cid}?=name={name}")
     Call<String> nameReg(@Path("cid")int cid, @Path("name") String name);
 
+    @GET("/nameget?={name}")
+    Call<String> nameGet(@Path("name")String name);
 
 }
