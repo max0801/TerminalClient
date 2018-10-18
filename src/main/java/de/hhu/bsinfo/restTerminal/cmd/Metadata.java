@@ -1,71 +1,129 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
+import de.hhu.bsinfo.restTerminal.data.Message;
+import de.hhu.bsinfo.restTerminal.data.MetadataEntry;
+import de.hhu.bsinfo.restTerminal.error.APIError;
+import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
+import de.hhu.bsinfo.restTerminal.files.FileSaving;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
-import de.hhu.bsinfo.restTerminal.files.LogFileSaver;
-import de.hhu.bsinfo.restTerminal.rest.AppService;
 import de.hhu.bsinfo.restTerminal.rest.MetadataService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 
 @ShellComponent
-public class Metadata extends AbstractCommand implements LogFileSaver<String> {
+public class Metadata extends AbstractCommand implements FileSaving {
     private MetadataService metadataService = retrofit.create(MetadataService.class);
-    private int nid;
-    private static String ON_FAILURE_MESSAGE = "NO RESPONSE";
-    private static String FOLDER_PATH = "Metadata"+ File.separator ;
+    private String nid;
+    private String ON_FAILURE_MESSAGE = "NO RESPONSE";
+    private String FOLDER_PATH = "Metadata" + File.separator;
+    private String currentDateTime;
+    private MetadataEntry METADATA_RESPONSE_ONE;
+    private List<MetadataEntry> METADATA_RESPONSE_ALL;
+    private String ON_SUCCESS_MESSAGE;
+    private String ERROR_MESSAGE;
 
     @ShellMethod(value = "Get summary of all or one superper's metadata", group = "Metadata Commands")
     public void metadata(
-            @ShellOption(value = {"--nid", "-n"}, defaultValue = "-1", help = "Node <nid> where the metadata is requested from") int nid) {
+            @ShellOption(value = {"--nid", "-n"}, defaultValue = "",
+                    help = "Node <nid> where the metadata is requested from") String nid) {
         this.nid = nid;
-        //TODO add functionality to distinguish between getting metadata from one or all peers
-        String message = "print metadata";
-        System.out.println(message);
-        saveToLogFile(message);
 
-//        Call<String> call = chunkService.chunkCreate(nid, size);
-//        call.enqueue(new Callback<String>() {
-//            @Override
-//            public void onResponse(Call<String> call, Response<String> response) {
-//                if (APIError.isError(response.body())) {
-//                    APIError error = ErrorUtils.parseError(response);
-//                    saveToLogFile(error.getMessage());
-//                } else {
-//                    String answer = response.body();
-//                    saveToLogFile(answer);
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<String> call, Throwable t) {
-//                saveToLogFile(ON_FAILURE_MESSAGE);
-//            }
-//        });
+        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
+                ROOT_PATH + FOLDER_PATH, true);
+        if (nid.isEmpty()) {
+            Call<List<MetadataEntry>> allEntries = metadataService.metadataFromAllPeers();
+            Response<List<MetadataEntry>> response = null;
+            try {
+                response = allEntries.execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (!response.isSuccessful()) {
+                APIError error = ErrorUtils.parseError(response, retrofit);
+                ERROR_MESSAGE = error.getError();
+                saveErrorResponse();
+            } else {
+                METADATA_RESPONSE_ALL = response.body();
+                saveSuccessfulResponse();
+            }
+        } else {
+            Call<MetadataEntry> singleEntry = metadataService.metadataFromOnePeer(nid);
+            Response<MetadataEntry> response = null;
+            try {
+                response = singleEntry.execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (!response.isSuccessful()) {
+                APIError error = ErrorUtils.parseError(response, retrofit);
+                ERROR_MESSAGE = error.getError();
+                saveErrorResponse();
+            } else {
+                METADATA_RESPONSE_ONE = response.body();
+                saveSuccessfulResponse();
+            }
+        }
+
     }
 
 
     @Override
-    public void saveToLogFile(String chunkCreate) {
+    public void saveErrorResponse() {
         try {
-            String dateTime = FolderHierarchy.createDateTimeFolderHierarchy(ROOT_PATH + FOLDER_PATH, false);
-            Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + dateTime + "log.txt");
-            Files.write(logFilePath, chunkCreate.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
+            Files.write(logFilePath, ERROR_MESSAGE.getBytes(), StandardOpenOption.CREATE);
+            printErrorToTerminal();
         } catch (IOException e) {
             e.printStackTrace();
-            System.exit(1);
         }
-
-
     }
 
+    @Override
+    public void saveSuccessfulResponse() {
+        try {
+            Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
+            Files.write(logFilePath, ON_SUCCESS_MESSAGE.getBytes(), StandardOpenOption.CREATE);
 
+            if (nid.isEmpty()) {
+                Path dataFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "data.txt");
+                for (MetadataEntry entry : METADATA_RESPONSE_ALL) {
+                    Files.write(dataFilePath, ("nid: " + entry.getNid()).getBytes(),
+                            StandardOpenOption.APPEND);
+                    Files.write(dataFilePath, ("metadata: " + entry.getMetadata()).getBytes(),
+                            StandardOpenOption.APPEND);
+                }
+            } else {
+                Path dataFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "data.txt");
+                Files.write(dataFilePath, ("nid: " + METADATA_RESPONSE_ONE.getNid()).getBytes(),
+                        StandardOpenOption.APPEND);
+                Files.write(dataFilePath, ("metadata: " + METADATA_RESPONSE_ONE.getMetadata()).getBytes(),
+                        StandardOpenOption.APPEND);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void printErrorToTerminal() {
+        System.out.println("ERROR");
+        System.out.println("Please check out the following file: "
+                + ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
+
+    }
 }

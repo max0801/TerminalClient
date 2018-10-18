@@ -1,8 +1,15 @@
 package de.hhu.bsinfo.restTerminal.data;
 
 public class ChunkRange {
-    String localChunkRanges;
-    String migratedChunkRanges;
+    private String localChunkRanges;
+    private String migratedChunkRanges;
+
+    public String getMigratedChunkRanges() {
+        return migratedChunkRanges;
+    }
 
 
+    public String getLocalChunkRanges() {
+        return localChunkRanges;
+    }
 }

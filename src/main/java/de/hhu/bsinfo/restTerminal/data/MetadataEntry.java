@@ -8,4 +8,12 @@ public class MetadataEntry {
         this.nid = nid;
         this.metadata = metadata;
     }
+
+    public String getNid() {
+        return nid;
+    }
+
+    public String getMetadata() {
+        return metadata;
+    }
 }

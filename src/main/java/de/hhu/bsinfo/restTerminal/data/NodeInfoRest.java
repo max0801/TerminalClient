@@ -12,5 +12,21 @@ public class NodeInfoRest {
         this.address = address;
         this.capabilities = capabilities;
     }
+
+    public String getNid() {
+        return nid;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getCapabilities() {
+        return capabilities;
+    }
 }
 

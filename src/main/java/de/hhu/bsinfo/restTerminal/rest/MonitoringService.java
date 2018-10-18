@@ -4,9 +4,11 @@ import de.hhu.bsinfo.dxram.monitoring.MonitoringDataStructure;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
+
 public interface MonitoringService {
-    @GET("/monitor?nid={nid}")
-    Call<MonitoringDataStructure> monitor(@Path("nid") int nid);
+    @GET("/monitor")
+    Call<MonitoringDataStructure> monitor(@Query("nid") String nid);
 
 
 }

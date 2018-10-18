@@ -4,9 +4,10 @@ import de.hhu.bsinfo.dxram.lookup.overlay.storage.LookupTree;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface LookupService {
-    @GET("/lookuptree?nid={NID}")
-    Call<LookupTree> logInfo(@Path("NID") int nodeID);
+    @GET("/lookuptree")
+    Call<LookupTree> logInfo(@Query("nid") int nodeID);
 
 }
