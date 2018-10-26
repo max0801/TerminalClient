@@ -15,6 +15,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import javax.validation.constraints.Pattern;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -33,10 +34,12 @@ public class ChunkRemove extends AbstractCommand implements FileSaving {
     private String currentDateTime;
     private Message CHUNKREMOVE_RESPONSE;
     private String ERROR_MESSAGE;
+    private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
     @ShellMethod(value = "Remove chunk with CID", group = "Chunk Commands")
     public void chunkremove(
-            @ShellOption(value = {"--cid", "-c"}, help = "chunk that is supposed to be removed") String cid) {
+            @ShellOption(value = {"--cid", "-c"}, help = "chunk that is supposed to be removed")
+                @Pattern(regexp = CHUNK_REGEX, message = "Invalid ChunkID") String cid) {
 
         this.cid = cid;
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(

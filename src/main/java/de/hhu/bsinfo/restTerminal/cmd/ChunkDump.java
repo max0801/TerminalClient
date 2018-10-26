@@ -16,6 +16,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import javax.validation.constraints.Pattern;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -34,10 +35,14 @@ public class ChunkDump extends AbstractCommand implements FileSaving {
     private String ERROR_MESSAGE;
     private String filename;
     private String cid;
+    private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
+    private static final String FILENAME_REGEX = "^[^<>:|?*]*$";
     @ShellMethod(value = "creates a filedump of <cid> saved as <name>", group = "Chunk Commands")
     public void chunkdump(
-            @ShellOption(value = {"--filename", "-f"}, help = "filename of the dump") String filename,
-            @ShellOption(value = {"--cid", "-c"}, help = "chunk of which a filedump is created") String cid) {
+            @ShellOption(value = {"--filename", "-f"}, help = "filename of the dump")
+                    @Pattern(regexp = FILENAME_REGEX, message = "Invalid filename") String filename,
+            @ShellOption(value = {"--cid", "-c"}, help = "chunk of which a filedump is created")
+            @Pattern(regexp = CHUNK_REGEX, message = "Invalid ChunkID") String cid) {
         this.filename = filename;
         this.cid = cid;
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
@@ -76,7 +81,6 @@ public class ChunkDump extends AbstractCommand implements FileSaving {
         try {
             Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
             Files.write(logFilePath, CHUNKDUMP_RESPONSE.getMessage().getBytes(), StandardOpenOption.CREATE);
-            System.out.println("created Filedump with name " + filename + " of Chunk " + cid);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -28,20 +28,16 @@ import java.util.List;
 @ShellComponent
 public class AppList extends AbstractCommand implements FileSaving {
     private AppService appService = retrofit.create(AppService.class);
-    private String nid;
     private String FOLDER_PATH = "AppList" + File.separator;
     private String currentDateTime;
     private String ON_SUCCESS_MESSAGE;
     private List<String> APPLIST_RESPONSE;
     private String ERROR_MESSAGE;
 
-    @ShellMethod(value = "Lists available applications to run on a remote peer", group = "App Commands")
-    public void applist(
-            @ShellOption(value = {"--nid", "-n"}, help = "Node <nid> with all available applications") String nid) {
-        this.nid = nid;
-
+    @ShellMethod(value = "Lists available applications", group = "App Commands")
+    public void applist() {
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(ROOT_PATH + FOLDER_PATH, true);
-        Call<List<String>> call = appService.appList(nid);
+        Call<List<String>> call = appService.appList();
         Response<List<String>> response = null;
         try {
             response = call.execute();
@@ -53,6 +49,7 @@ public class AppList extends AbstractCommand implements FileSaving {
             ERROR_MESSAGE = error.getError();
             saveErrorResponse();
         } else {
+            ON_SUCCESS_MESSAGE = "AppList has been received";
             APPLIST_RESPONSE = response.body();
             saveSuccessfulResponse();
         }

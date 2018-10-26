@@ -57,6 +57,7 @@ public class NameList extends AbstractCommand implements FileSaving {
             ERROR_MESSAGE = error.getError();
             saveErrorResponse();
         } else {
+            ON_SUCCESS_MESSAGE = "Namelist of all nodes has been received";
             NAMELIST_RESPONSE = response.body();
             saveSuccessfulResponse();
         }
@@ -81,7 +82,6 @@ public class NameList extends AbstractCommand implements FileSaving {
             Files.write(logFilePath, ON_SUCCESS_MESSAGE.getBytes(), StandardOpenOption.CREATE);
 
             Path dataFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "data.txt");
-            Files.createFile(dataFilePath);
             List<NameListEntry> entries = NAMELIST_RESPONSE.getEntries();
             Files.write(dataFilePath, ("NameList:" + System.lineSeparator()).getBytes(),
                     StandardOpenOption.APPEND);

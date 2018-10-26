@@ -16,6 +16,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -35,12 +38,15 @@ public class ChunkCreate extends AbstractCommand implements FileSaving {
     private String currentDateTime;
     private Message CHUNKCREATE_RESPONSE;
     private String ERROR_MESSAGE;
+    private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
+
 
     @ShellMethod(value = "creates a chunk on node <nid> with size <size>", group = "Chunk Commands")
     public void chunkcreate(
-            @ShellOption(value = {"--nid", "-n"}, help = "Node <nid> of the created chunk") String nid,
+            @ShellOption(value = {"--nid", "-n"}, help = "Node <nid> of the created chunk")
+                @Pattern(regexp = NODE_REGEX, message = "Invalid NodeID") String nid,
             @ShellOption(value = {"--size", "-s"}, defaultValue = "16",
-                    help = "size of the created chunk in byte") int size) {
+                    help = "size of the created chunk in byte") @Positive int size) {
         this.nid = nid;
         this.size = size;
 

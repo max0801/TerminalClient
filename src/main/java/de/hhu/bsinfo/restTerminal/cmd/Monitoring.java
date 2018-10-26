@@ -24,7 +24,7 @@ import java.nio.file.StandardOpenOption;
 //    private  String ERROR_MESSAGE;
 //    private  String ON_SUCCESS_MESSAGE;
 //    private  String FOLDER_PATH = "Monitoring" + File.separator;
-//
+//          private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
 //
 //    @ShellMethod(value = "gets monitoring data from node <nid>", group = "Monitoring Commands")
 //    public void monitor(

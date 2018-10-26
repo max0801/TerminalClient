@@ -10,5 +10,5 @@ import java.util.List;
 
 public interface StatsService {
     @GET("/statsprint")
-    Call<HTMLDocument> printStats(@Query("interval") int intervalInSeconds);
+    Call<String> printStats(@Query("interval") int intervalInSeconds);
 }

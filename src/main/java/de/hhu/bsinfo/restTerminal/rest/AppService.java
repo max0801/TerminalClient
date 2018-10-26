@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface AppService {
     @GET("/applist")
-    Call<List<String>>appList(@Query("nid") String nodeID);
+    Call<List<String>>appList();
 
     @GET("/apprun")
     Call<Message> appRun(@Query("nid") String nid, @Query("app") String appName);

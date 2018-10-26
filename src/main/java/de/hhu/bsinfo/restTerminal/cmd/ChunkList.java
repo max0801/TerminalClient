@@ -15,6 +15,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import javax.validation.constraints.Pattern;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -33,11 +34,13 @@ public class ChunkList extends AbstractCommand implements FileSaving {
     private String ON_SUCCESS_MESSAGE;
     private String FOLDER_PATH = "ChunkList" + File.separator;
     private String nid;
+    private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
 
     @ShellMethod(value = "list all chunks on node <nid>", group = "Chunk Commands")
     public void chunklist(
             @ShellOption(value = {"--nid", "-n"},
-                    help = "The node <nid> where the list of chunks is referring to") String nid,
+                    help = "The node <nid> where the list of chunks is referring to")
+                @Pattern(regexp = NODE_REGEX, message = "Invalid NodeID")String nid,
             @ShellOption(value = {"--print", "-p"},
                     help = "print chunklist to stdout", defaultValue = "false") boolean print) {
 
@@ -57,6 +60,7 @@ public class ChunkList extends AbstractCommand implements FileSaving {
             ERROR_MESSAGE = error.getError();
             saveErrorResponse();
         } else {
+            ON_SUCCESS_MESSAGE = "Chunklist of node "+nid+ " has been received";
             CHUNKLIST_RESPONSE = response.body();
             saveSuccessfulResponse();
         }

@@ -14,6 +14,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import javax.validation.constraints.Pattern;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -35,12 +36,15 @@ public class ChunkGet extends AbstractCommand implements FileSaving {
     private String ERROR_MESSAGE;
     private String cid;
     private String type;
+    private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
     @ShellMethod(value = "requests a chunk with id <cid> and type <type>", group = "Chunk Commands")
     public void chunkget(
-            @ShellOption(value = {"--cid", "-c"}, help = "chunk ID of the requested chunk") String cid,
+            @ShellOption(value = {"--cid", "-c"}, help = "chunk ID of the requested chunk")
+                @Pattern(regexp = CHUNK_REGEX, message = "Invalid ChunkID") String cid,
             @ShellOption(value = {"--type", "-t"}, defaultValue = "str",
-                    help = "type of the requested chunk [str,byte,short,int,long]") String type,
+                    help = "type of the requested chunk [str,byte,short,int,long]")
+                    @Pattern(regexp = "str|long|int|byte|short", message = "Datatype is not supported") String type,
             @ShellOption(value = {"--print", "-p"},
                     help = "print chunk to stdout", defaultValue = "false") boolean print) {
         this.cid = cid;
@@ -60,6 +64,7 @@ public class ChunkGet extends AbstractCommand implements FileSaving {
             ERROR_MESSAGE = error.getError();
             saveErrorResponse();
         } else {
+            ON_SUCCESS_MESSAGE = "Received chunk  "+cid+ " with type "+type+"";
             CHUNKGET_RESPONSE = response.body();
             saveSuccessfulResponse();
         }

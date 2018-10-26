@@ -24,6 +24,8 @@
 //    private  de.hhu.bsinfo.dxram.lookup.overlay.storage.LookupTree LOOKUPTREE_RESPONSE;
 //    private  String ERROR_MESSAGE;
 //    private  String ON_SUCCESS_MESSAGE;
+        //private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
+
 //
 //    @ShellMethod(value = "Get the look up tree of a specified node", group = "Lookup Tree Commands")
 //    public void lookuptree(

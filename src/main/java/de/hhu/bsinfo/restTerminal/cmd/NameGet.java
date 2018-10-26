@@ -55,6 +55,7 @@ public class NameGet extends AbstractCommand implements FileSaving {
             ERROR_MESSAGE = error.getError();
             saveErrorResponse();
         } else {
+            ON_SUCCESS_MESSAGE = "Chunk with the name " + name + " has been received";
             NAMEGET_RESPONSE = response.body();
             saveSuccessfulResponse();
         }

@@ -15,6 +15,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import javax.validation.constraints.Pattern;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -36,11 +37,14 @@ public class Metadata extends AbstractCommand implements FileSaving {
     private List<MetadataEntry> METADATA_RESPONSE_ALL;
     private String ON_SUCCESS_MESSAGE;
     private String ERROR_MESSAGE;
+    private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
+
 
     @ShellMethod(value = "Get summary of all or one superper's metadata", group = "Metadata Commands")
     public void metadata(
             @ShellOption(value = {"--nid", "-n"}, defaultValue = "",
-                    help = "Node <nid> where the metadata is requested from") String nid) {
+                    help = "Node <nid> where the metadata is requested from")
+                @Pattern(regexp = NODE_REGEX, message = "Invalid NodeID") String nid) {
         this.nid = nid;
 
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
@@ -58,6 +62,7 @@ public class Metadata extends AbstractCommand implements FileSaving {
                 ERROR_MESSAGE = error.getError();
                 saveErrorResponse();
             } else {
+                ON_SUCCESS_MESSAGE = "Metadata of all superpeers has been received";
                 METADATA_RESPONSE_ALL = response.body();
                 saveSuccessfulResponse();
             }
@@ -74,6 +79,7 @@ public class Metadata extends AbstractCommand implements FileSaving {
                 ERROR_MESSAGE = error.getError();
                 saveErrorResponse();
             } else {
+                ON_SUCCESS_MESSAGE = "Metadata of superpeer " + nid + " has been received";
                 METADATA_RESPONSE_ONE = response.body();
                 saveSuccessfulResponse();
             }

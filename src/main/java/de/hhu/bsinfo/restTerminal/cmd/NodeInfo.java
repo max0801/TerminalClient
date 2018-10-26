@@ -14,6 +14,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import javax.validation.constraints.Pattern;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -34,10 +35,12 @@ public class NodeInfo extends AbstractCommand implements FileSaving {
     private String ON_SUCCESS_MESSAGE;
     private String nid;
     private NodeService nodeService;
+    private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
 
     @ShellMethod(value = "Get information about a node in the network", group = "Node Commands")
     public void nodeinfo(
-            @ShellOption(value = {"--nid", "-n"}, help = "Node <nid> which info is requested") String nid) {
+            @ShellOption(value = {"--nid", "-n"}, help = "Node <nid> which info is requested")
+                @Pattern(regexp = NODE_REGEX, message = "Invalid NodeID") String nid) {
 
         this.nid = nid;
 
@@ -45,36 +48,26 @@ public class NodeInfo extends AbstractCommand implements FileSaving {
                 ROOT_PATH + FOLDER_PATH, true);
         nodeService = retrofit.create(NodeService.class);
         Call<NodeInfoRest> call = nodeService.nodeInfo(nid);
-        call.enqueue(new Callback<NodeInfoRest>() {
-            @Override
-            public void onResponse(Call<NodeInfoRest> call, Response<NodeInfoRest> response) {
-                if (!response.isSuccessful()) {
-                    APIError error = ErrorUtils.parseError(response, retrofit);
-                    ERROR_MESSAGE = error.getError();
-                    printErrorToTerminal();
-                    saveErrorResponse();
-                } else {
-                    ON_SUCCESS_MESSAGE = "Nodeinfo successfully saved";
-                    NODEINFO_RESPONSE = response.body();
-                    saveSuccessfulResponse();
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<NodeInfoRest> call, Throwable t) {
-                StringWriter sw = new StringWriter();
-                t.printStackTrace(new PrintWriter(sw));
-                ERROR_MESSAGE = sw.toString();
-                printErrorToTerminal();
-                saveErrorResponse();
-            }
-        });
+        Response<NodeInfoRest> response = null;
+        try {
+            response = call.execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (!response.isSuccessful()) {
+            APIError error = ErrorUtils.parseError(response, retrofit);
+            ERROR_MESSAGE = error.getError();
+            saveErrorResponse();
+        } else {
+            ON_SUCCESS_MESSAGE = "Nodeinfo of node " + nid + " has been received";
+            NODEINFO_RESPONSE = response.body();
+            saveSuccessfulResponse();
+        }
     }
 
 
     @Override
-    public void saveErrorResponse()  {
+    public void saveErrorResponse() {
         try {
             Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
             Files.write(logFilePath, ERROR_MESSAGE.getBytes(), StandardOpenOption.CREATE);

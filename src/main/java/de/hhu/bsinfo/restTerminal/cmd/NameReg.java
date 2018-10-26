@@ -14,6 +14,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import javax.validation.constraints.Pattern;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -33,10 +34,12 @@ public class NameReg extends AbstractCommand implements FileSaving {
     private String ERROR_MESSAGE;
     private String cid;
     private String name;
+    private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
     @ShellMethod(value = "register chunk <cid> with <name>", group = "Name Commands")
     public void namereg(
-            @ShellOption(value = {"--cid", "-c"}, help = "chunk <cid> which is named") String cid,
+            @ShellOption(value = {"--cid", "-c"}, help = "chunk <cid> which is named")
+                @Pattern(regexp = CHUNK_REGEX, message = "Invalid ChunkID") String cid,
             @ShellOption(value = {"--name", "-n"}, help = "name of the chunk") String name) {
         this.cid = cid;
         this.name = name;
@@ -86,7 +89,7 @@ public class NameReg extends AbstractCommand implements FileSaving {
             Files.write(logFilePath, NAMEREG_RESPONSE.getMessage().getBytes(),
                     StandardOpenOption.CREATE);
             Files.write(logFilePath, (" for the following chunk id: " + cid).getBytes(),
-                    StandardOpenOption.CREATE);
+                    StandardOpenOption.APPEND);
         } catch (IOException e) {
             e.printStackTrace();
         }

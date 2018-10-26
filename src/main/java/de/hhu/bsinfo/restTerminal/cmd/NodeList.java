@@ -56,6 +56,7 @@ public class NodeList extends AbstractCommand implements FileSaving {
             ERROR_MESSAGE = error.getError();
             saveErrorResponse();
         } else {
+            ON_SUCCESS_MESSAGE = "Nodelist has been received";
             NODELIST_RESPONSE = response.body();
             saveSuccessfulResponse();
         }

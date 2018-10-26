@@ -18,6 +18,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import javax.validation.constraints.Pattern;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -38,14 +39,17 @@ public class ChunkPut extends AbstractCommand implements FileSaving {
     private String cid;
     private Object data;
     private String type;
+    private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
     @ShellMethod(value = "put <data> with <type> on chunk <cid>", group = "Chunk Commands")
     public void chunkput(
-            @ShellOption(value = {"--cid", "-c"}, help = "chunk ID of the submitted chunk") String cid,
+            @ShellOption(value = {"--cid", "-c"}, help = "chunk ID of the submitted chunk")
+                @Pattern(regexp = CHUNK_REGEX, message = "Invalid ChunkID") String cid,
             @ShellOption(value = {"--data", "-d"}, help = "data that is saved in the chunk") Object data,
             @ShellOption(value = {"--type", "-t"}, defaultValue = "str",
-                    help = "type of the submitted chunk [str,byte,short,int,long]") String type) {
-        //TODO Dateitypen als Object übergeben?
+                    help = "type of the submitted chunk [str,byte,short,int,long]")
+                @Pattern(regexp = "str|long|int|byte|short", message = "Datatype is not supported") String type) {
+
         this.cid = cid;
         this.type = type;
         this.data = data;

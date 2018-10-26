@@ -27,6 +27,8 @@ public class LogInfo extends AbstractCommand implements FileSaving {
     private  String LOGINFO_RESPONSE;
     private  String ERROR_MESSAGE;
     private  String ON_SUCCESS_MESSAGE;
+    private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
+
     @ShellMethod(value = "Prints the log utilization of given peer", group = "Log Commands")
     public void loginfo(
             @ShellOption(value = {"--nid", "-n"},
