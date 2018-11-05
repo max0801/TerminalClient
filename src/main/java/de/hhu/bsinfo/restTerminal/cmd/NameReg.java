@@ -11,14 +11,11 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 import javax.validation.constraints.Pattern;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,10 +25,10 @@ import java.nio.file.StandardOpenOption;
 @ShellComponent
 public class NameReg extends AbstractCommand implements FileSaving {
     private NameService nameService = retrofit.create(NameService.class);
-    private String FOLDER_PATH = "NameReg" + File.separator;
+    private String folderPath = "NameReg" + File.separator;
     private String currentDateTime;
-    private Message NAMEREG_RESPONSE;
-    private String ERROR_MESSAGE;
+    private Message nameRegResponse;
+    private String errorMessage;
     private String cid;
     private String name;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
@@ -43,9 +40,8 @@ public class NameReg extends AbstractCommand implements FileSaving {
             @ShellOption(value = {"--name", "-n"}, help = "name of the chunk") String name) {
         this.cid = cid;
         this.name = name;
-
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                ROOT_PATH + FOLDER_PATH, false);
+                rootPath + folderPath, false);
         nameService = retrofit.create(NameService.class);
         Call<Message> call = nameService.nameReg(cid, name);
         Response<Message> response = null;
@@ -56,10 +52,10 @@ public class NameReg extends AbstractCommand implements FileSaving {
         }
         if (!response.isSuccessful()) {
             APIError error = ErrorUtils.parseError(response, retrofit);
-            ERROR_MESSAGE = error.getError();
+            errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            NAMEREG_RESPONSE = response.body();
+            nameRegResponse = response.body();
             saveSuccessfulResponse();
         }
     }
@@ -68,14 +64,14 @@ public class NameReg extends AbstractCommand implements FileSaving {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
+                + rootPath + folderPath + currentDateTime + "log.txt");
     }
 
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
-            Files.write(logFilePath, ERROR_MESSAGE.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+            Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
             e.printStackTrace();
@@ -85,8 +81,8 @@ public class NameReg extends AbstractCommand implements FileSaving {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
-            Files.write(logFilePath, NAMEREG_RESPONSE.getMessage().getBytes(),
+            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+            Files.write(logFilePath, nameRegResponse.getMessage().getBytes(),
                     StandardOpenOption.CREATE);
             Files.write(logFilePath, (" for the following chunk id: " + cid).getBytes(),
                     StandardOpenOption.APPEND);

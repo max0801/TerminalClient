@@ -6,38 +6,31 @@ import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FileSaving;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
-import de.hhu.bsinfo.restTerminal.files.LogFileSaver;
 import de.hhu.bsinfo.restTerminal.rest.ChunkService;
-import de.hhu.bsinfo.restTerminal.rest.NodeService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.List;
 
 @ShellComponent
 public class ChunkCreate extends AbstractCommand implements FileSaving {
     private ChunkService chunkService = retrofit.create(ChunkService.class);
     private String nid;
     private int size;
-    private String FOLDER_PATH = "ChunkCreate" + File.separator;
+    private String folderPath = "ChunkCreate" + File.separator;
     private String currentDateTime;
-    private Message CHUNKCREATE_RESPONSE;
-    private String ERROR_MESSAGE;
+    private Message chunkCreateResponse;
+    private String errorMessage;
     private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
 
 
@@ -51,7 +44,7 @@ public class ChunkCreate extends AbstractCommand implements FileSaving {
         this.size = size;
 
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                ROOT_PATH + FOLDER_PATH, false);
+                rootPath + folderPath, false);
         Call<Message> call = chunkService.chunkCreate(nid, size);
         Response<Message> response = null;
         try {
@@ -61,10 +54,10 @@ public class ChunkCreate extends AbstractCommand implements FileSaving {
         }
         if (!response.isSuccessful()) {
             APIError error = ErrorUtils.parseError(response, retrofit);
-            ERROR_MESSAGE = error.getError();
+            errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            CHUNKCREATE_RESPONSE = response.body();
+            chunkCreateResponse = response.body();
             saveSuccessfulResponse();
         }
     }
@@ -73,8 +66,8 @@ public class ChunkCreate extends AbstractCommand implements FileSaving {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
-            Files.write(logFilePath, ERROR_MESSAGE.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+            Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
             e.printStackTrace();
@@ -84,8 +77,8 @@ public class ChunkCreate extends AbstractCommand implements FileSaving {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
-            Files.write(logFilePath, CHUNKCREATE_RESPONSE.getMessage().getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+            Files.write(logFilePath, chunkCreateResponse.getMessage().getBytes(), StandardOpenOption.CREATE);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -95,6 +88,6 @@ public class ChunkCreate extends AbstractCommand implements FileSaving {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
+                + rootPath + folderPath + currentDateTime + "log.txt");
     }
 }

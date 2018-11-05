@@ -3,7 +3,6 @@ package de.hhu.bsinfo.restTerminal.files;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -60,13 +59,13 @@ public class FolderHierarchy {
         String dateTime = null;
         try {
             dateTime = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").
-                    format(new Date())+ File.separator;
+                    format(new Date()) + File.separator;
             String pathDateTime = path + dateTime + File.separator;
             Path directory = Paths.get(pathDateTime);
             Files.createDirectories(directory);
-            Files.createFile(Paths.get(pathDateTime+"log.txt"));
+            Files.createFile(Paths.get(pathDateTime + "log.txt"));
             if (dataAndLog) {
-                Files.createFile(Paths.get(pathDateTime+"data.txt"));
+                Files.createFile(Paths.get(pathDateTime + "data.txt"));
             }
         } catch (IOException e) {
             e.printStackTrace();

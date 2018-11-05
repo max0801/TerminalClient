@@ -1,29 +1,13 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
-import de.hhu.bsinfo.dxram.monitoring.MonitoringDataStructure;
-import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.files.FileSaving;
-import de.hhu.bsinfo.restTerminal.rest.MonitoringService;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
-import org.springframework.shell.standard.ShellOption;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-
-
 //@ShellComponent
 //public class Monitoring extends AbstractCommand implements FileSaving {
 //    private MonitoringService monitoringService = retrofit.create(MonitoringService.class);
 //    private  String currentDateTime;
 //    private  MonitoringDataStructure MONITORING_RESPONSE;
-//    private  String ERROR_MESSAGE;
-//    private  String ON_SUCCESS_MESSAGE;
-//    private  String FOLDER_PATH = "Monitoring" + File.separator;
+//    private  String errorMessage;
+//    private  String onSuccessMessage;
+//    private  String folderPath = "Monitoring" + File.separator;
 //          private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
 //
 //    @ShellMethod(value = "gets monitoring data from node <nid>", group = "Monitoring Commands")
@@ -58,18 +42,18 @@ import java.nio.file.StandardOpenOption;
 //
 //    @Override
 //    public void saveErrorResponse() throws IOException {
-//        Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
-//        Files.write(logFilePath, ERROR_MESSAGE.getBytes(), StandardOpenOption.CREATE);
+//        Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+//        Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
 //                        printErrorToTerminal();
 
 //    }
 //
 //    @Override
 //    public void saveSuccessfulResponse() throws IOException {
-//        Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
-//        Files.write(logFilePath, ON_SUCCESS_MESSAGE.getBytes(), StandardOpenOption.CREATE);
+//        Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+//        Files.write(logFilePath, onSuccessMessage.getBytes(), StandardOpenOption.CREATE);
 //
-////        Path dataFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "data.txt");
+////        Path dataFilePath = Paths.get(rootPath + folderPath + currentDateTime + "data.txt");
 ////        Files.write(dataFilePath, MONITORING_RESPONSE.getCpuLoads().toString().getBytes(), StandardOpenOption.CREATE);
 ////        Files.write(dataFilePath, String.valueOf(MONITORING_RESPONSE.getCpuUsage()).getBytes(), StandardOpenOption.CREATE);
 ////        Files.write(dataFilePath, MONITORING_RESPONSE.getDiskStats().toString().getBytes(), StandardOpenOption.CREATE);

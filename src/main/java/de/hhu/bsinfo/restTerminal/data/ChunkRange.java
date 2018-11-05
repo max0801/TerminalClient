@@ -8,7 +8,6 @@ public class ChunkRange {
         return migratedChunkRanges;
     }
 
-
     public String getLocalChunkRanges() {
         return localChunkRanges;
     }

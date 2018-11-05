@@ -1,27 +1,21 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.Message;
-import de.hhu.bsinfo.restTerminal.data.MetadataEntry;
 import de.hhu.bsinfo.restTerminal.data.NameListData;
 import de.hhu.bsinfo.restTerminal.data.NameListEntry;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FileSaving;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
-import de.hhu.bsinfo.restTerminal.rest.ChunkService;
 import de.hhu.bsinfo.restTerminal.rest.NameService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,18 +27,15 @@ import java.util.List;
 public class NameList extends AbstractCommand implements FileSaving {
     private NameService nameService = retrofit.create(NameService.class);
     private String currentDateTime;
-    private NameListData NAMELIST_RESPONSE;
-    private String ERROR_MESSAGE;
-    private String ON_SUCCESS_MESSAGE;
-    protected final String FOLDER_PATH = "NameList" + File.separator;
-
+    private NameListData nameListResponse;
+    private String errorMessage;
+    private String onSuccessMessage;
+    private String folderPath = "NameList" + File.separator;
+    private boolean print;
     @ShellMethod(value = "get namelist", group = "Name Commands")
-    public void namelist(
-            @ShellOption(value = {"--print", "-p"}, help = "print namelist to stdout",
-                    defaultValue = "false") boolean print) {
-
+    public void namelist() {
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                ROOT_PATH + FOLDER_PATH, true);
+                rootPath + folderPath, true);
         Call<NameListData> call = nameService.nameList();
         Response<NameListData> response = null;
         try {
@@ -54,11 +45,11 @@ public class NameList extends AbstractCommand implements FileSaving {
         }
         if (!response.isSuccessful()) {
             APIError error = ErrorUtils.parseError(response, retrofit);
-            ERROR_MESSAGE = error.getError();
+            errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            ON_SUCCESS_MESSAGE = "Namelist of all nodes has been received";
-            NAMELIST_RESPONSE = response.body();
+            onSuccessMessage = "Namelist of all nodes has been received";
+            nameListResponse = response.body();
             saveSuccessfulResponse();
         }
     }
@@ -67,8 +58,8 @@ public class NameList extends AbstractCommand implements FileSaving {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
-            Files.write(logFilePath, ERROR_MESSAGE.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+            Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
             e.printStackTrace();
@@ -78,11 +69,11 @@ public class NameList extends AbstractCommand implements FileSaving {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
-            Files.write(logFilePath, ON_SUCCESS_MESSAGE.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+            Files.write(logFilePath, onSuccessMessage.getBytes(), StandardOpenOption.CREATE);
 
-            Path dataFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "data.txt");
-            List<NameListEntry> entries = NAMELIST_RESPONSE.getEntries();
+            Path dataFilePath = Paths.get(rootPath + folderPath + currentDateTime + "data.txt");
+            List<NameListEntry> entries = nameListResponse.getEntries();
             Files.write(dataFilePath, ("NameList:" + System.lineSeparator()).getBytes(),
                     StandardOpenOption.APPEND);
 
@@ -104,7 +95,7 @@ public class NameList extends AbstractCommand implements FileSaving {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
+                + rootPath + folderPath + currentDateTime + "log.txt");
     }
 }
 

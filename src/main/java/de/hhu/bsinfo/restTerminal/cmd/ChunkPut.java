@@ -1,28 +1,21 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
-import com.google.gson.JsonObject;
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.ChunkRange;
 import de.hhu.bsinfo.restTerminal.data.Message;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FileSaving;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
-import de.hhu.bsinfo.restTerminal.files.LogFileSaver;
 import de.hhu.bsinfo.restTerminal.rest.ChunkService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
-import picocli.CommandLine;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 import javax.validation.constraints.Pattern;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,10 +25,10 @@ import java.nio.file.StandardOpenOption;
 @ShellComponent
 public class ChunkPut extends AbstractCommand implements FileSaving {
     private ChunkService chunkService = retrofit.create(ChunkService.class);
-    private String FOLDER_PATH = "ChunkPut" + File.separator;
+    private String folderPath = "ChunkPut" + File.separator;
     private String currentDateTime;
-    private Message CHUNKPUT_RESPONSE;
-    private String ERROR_MESSAGE;
+    private Message chunkPutResponse;
+    private String errorMessage;
     private String cid;
     private Object data;
     private String type;
@@ -55,7 +48,7 @@ public class ChunkPut extends AbstractCommand implements FileSaving {
         this.data = data;
 
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                ROOT_PATH + FOLDER_PATH, false);
+                rootPath + folderPath, false);
         Call<Message> call = chunkService.chunkPut(cid, type, data);
         Response<Message> response = null;
         try {
@@ -65,10 +58,10 @@ public class ChunkPut extends AbstractCommand implements FileSaving {
         }
         if (!response.isSuccessful()) {
             APIError error = ErrorUtils.parseError(response, retrofit);
-            ERROR_MESSAGE = error.getError();
+            errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            CHUNKPUT_RESPONSE = response.body();
+            chunkPutResponse = response.body();
             saveSuccessfulResponse();
         }
     }
@@ -76,8 +69,8 @@ public class ChunkPut extends AbstractCommand implements FileSaving {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
-            Files.write(logFilePath, ERROR_MESSAGE.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+            Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
             e.printStackTrace();
@@ -87,8 +80,8 @@ public class ChunkPut extends AbstractCommand implements FileSaving {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
-            Files.write(logFilePath, CHUNKPUT_RESPONSE.getMessage().getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+            Files.write(logFilePath, chunkPutResponse.getMessage().getBytes(), StandardOpenOption.CREATE);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -98,7 +91,7 @@ public class ChunkPut extends AbstractCommand implements FileSaving {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
+                + rootPath + folderPath + currentDateTime + "log.txt");
     }
 }
 

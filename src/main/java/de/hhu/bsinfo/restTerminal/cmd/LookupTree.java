@@ -18,12 +18,11 @@
 //public class LookupTree extends AbstractCommand implements FileSaving {
 //    private LookupService lookupService = retrofit.create(LookupService.class);
 //    private int nid;
-//    private  String ON_FAILURE_MESSAGE = "NO RESPONSE";
-//    private  String FOLDER_PATH = "LookupTree"+ File.separator ;
+//    private  String folderPath = "LookupTree"+ File.separator ;
 //    private  String currentDateTime;
 //    private  de.hhu.bsinfo.dxram.lookup.overlay.storage.LookupTree LOOKUPTREE_RESPONSE;
-//    private  String ERROR_MESSAGE;
-//    private  String ON_SUCCESS_MESSAGE;
+//    private  String errorMessage;
+//    private  String onSuccessMessage;
         //private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
 
 //
@@ -55,17 +54,17 @@
 //
 //    @Override
 //    public void saveErrorResponse() throws IOException {
-//        Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
-//        Files.write(logFilePath, ERROR_MESSAGE.getBytes(), StandardOpenOption.CREATE);
+//        Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+//        Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
 //                    printErrorToTerminal();
 //    }
 //
 //    @Override
 //    public void saveSuccessfulResponse() throws IOException {
-//        Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
-//        //Files.write(logFilePath, ON_SUCCESS_MESSAGE.getBytes(), StandardOpenOption.CREATE);
+//        Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+//        //Files.write(logFilePath, onSuccessMessage.getBytes(), StandardOpenOption.CREATE);
 //
-//        Path dataFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "data.txt");
+//        Path dataFilePath = Paths.get(rootPath + folderPath + currentDateTime + "data.txt");
 //        //Files.write(dataFilePath, LOOKUPTREE_RESPONSE.toString().getBytes(), StandardOpenOption.CREATE);
 //    }
 //}

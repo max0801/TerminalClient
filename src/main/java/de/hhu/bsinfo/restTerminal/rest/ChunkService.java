@@ -3,7 +3,8 @@ package de.hhu.bsinfo.restTerminal.rest;
 import de.hhu.bsinfo.restTerminal.data.ChunkRange;
 import de.hhu.bsinfo.restTerminal.data.Message;
 import retrofit2.Call;
-import retrofit2.http.*;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
 
 public interface ChunkService {
     @GET("/chunkcreate")
@@ -22,9 +23,8 @@ public interface ChunkService {
     @GET("/chunkdump")
     Call<Message> chunkDump(@Query("cid") String chunkID, @Query("name") String name);
 
-    //Not yet implemented
-    //@GET("/chunklocklist?nid={nid}")
-    //Call<String>chunkLockList(@Path("nid") int nodeID);
+//    @GET("/chunklocklist")
+//    Call<Message>chunkLockList(@Query("nid") int nodeID);
 
     @GET("/chunkremove")
     Call<Message> chunkRemove(@Query("cid") String chunkID);

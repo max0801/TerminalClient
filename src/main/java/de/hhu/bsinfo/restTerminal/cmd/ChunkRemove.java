@@ -6,20 +6,16 @@ import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FileSaving;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
-import de.hhu.bsinfo.restTerminal.files.LogFileSaver;
 import de.hhu.bsinfo.restTerminal.rest.ChunkService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 
 import javax.validation.constraints.Pattern;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,11 +25,10 @@ import java.nio.file.StandardOpenOption;
 public class ChunkRemove extends AbstractCommand implements FileSaving {
     private ChunkService chunkService = retrofit.create(ChunkService.class);
     private String cid;
-    private String ON_FAILURE_MESSAGE = "NO RESPONSE";
-    private String FOLDER_PATH = "ChunkRemove" + File.separator;
+    private String folderPath = "ChunkRemove" + File.separator;
     private String currentDateTime;
-    private Message CHUNKREMOVE_RESPONSE;
-    private String ERROR_MESSAGE;
+    private Message chunkRemoveResponse;
+    private String errorMessage;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
     @ShellMethod(value = "Remove chunk with CID", group = "Chunk Commands")
@@ -43,7 +38,7 @@ public class ChunkRemove extends AbstractCommand implements FileSaving {
 
         this.cid = cid;
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                ROOT_PATH + FOLDER_PATH, false);
+                rootPath + folderPath, false);
         Call<Message> call = chunkService.chunkRemove(cid);
         Response<Message> response = null;
         try {
@@ -53,10 +48,10 @@ public class ChunkRemove extends AbstractCommand implements FileSaving {
         }
         if (!response.isSuccessful()) {
             APIError error = ErrorUtils.parseError(response, retrofit);
-            ERROR_MESSAGE = error.getError();
+            errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            CHUNKREMOVE_RESPONSE = response.body();
+            chunkRemoveResponse = response.body();
             saveSuccessfulResponse();
         }
     }
@@ -64,8 +59,8 @@ public class ChunkRemove extends AbstractCommand implements FileSaving {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
-            Files.write(logFilePath, ERROR_MESSAGE.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+            Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
             e.printStackTrace();
@@ -75,8 +70,8 @@ public class ChunkRemove extends AbstractCommand implements FileSaving {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
-            Files.write(logFilePath, CHUNKREMOVE_RESPONSE.getMessage().getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+            Files.write(logFilePath, chunkRemoveResponse.getMessage().getBytes(), StandardOpenOption.CREATE);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -86,6 +81,6 @@ public class ChunkRemove extends AbstractCommand implements FileSaving {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + ROOT_PATH + FOLDER_PATH + currentDateTime + "log.txt");
+                + rootPath + folderPath + currentDateTime + "log.txt");
     }
 }
