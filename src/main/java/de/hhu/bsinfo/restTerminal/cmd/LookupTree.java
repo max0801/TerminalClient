@@ -15,7 +15,7 @@
 //import java.nio.file.StandardOpenOption;
 //
 //@ShellComponent
-//public class LookupTree extends AbstractCommand implements FileSaving {
+//public class LookupTree extends AbstractCommand  {
 //    private LookupService lookupService = retrofit.create(LookupService.class);
 //    private int nid;
 //    private  String folderPath = "LookupTree"+ File.separator ;
@@ -54,17 +54,17 @@
 //
 //    @Override
 //    public void saveErrorResponse() throws IOException {
-//        Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+//        Path logFilePath = Paths.get(m_rootPath + folderPath + currentDateTime + "log.txt");
 //        Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
 //                    printErrorToTerminal();
 //    }
 //
 //    @Override
 //    public void saveSuccessfulResponse() throws IOException {
-//        Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+//        Path logFilePath = Paths.get(m_rootPath + folderPath + currentDateTime + "log.txt");
 //        //Files.write(logFilePath, onSuccessMessage.getBytes(), StandardOpenOption.CREATE);
 //
-//        Path dataFilePath = Paths.get(rootPath + folderPath + currentDateTime + "data.txt");
+//        Path dataFilePath = Paths.get(m_rootPath + folderPath + currentDateTime + "data.txt");
 //        //Files.write(dataFilePath, LOOKUPTREE_RESPONSE.toString().getBytes(), StandardOpenOption.CREATE);
 //    }
 //}

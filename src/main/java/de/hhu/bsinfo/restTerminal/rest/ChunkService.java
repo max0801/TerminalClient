@@ -2,33 +2,27 @@ package de.hhu.bsinfo.restTerminal.rest;
 
 import de.hhu.bsinfo.restTerminal.data.ChunkRange;
 import de.hhu.bsinfo.restTerminal.data.Message;
+import de.hhu.bsinfo.restTerminal.request.*;
 import retrofit2.Call;
-import retrofit2.http.GET;
-import retrofit2.http.Query;
+import retrofit2.http.*;
 
 public interface ChunkService {
-    @GET("/chunkcreate")
-    Call<Message> chunkCreate(@Query("nid") String nodeID, @Query("size") int size);
+    @PUT("/chunkcreate")
+    Call<Message> chunkCreate(@Body ChunkCreateRequest p_chunkCreateRequest);
 
-    @GET ("/chunkget")
-    Call<String> chunkGet(@Query("cid") String chunkID, @Query("type") String type);
+    @PUT ("/chunkget")
+    Call<String> chunkGet(@Body ChunkGetRequest p_chunkGetRequest);
 
-    //TODO wie wird DATA übergeben? Wahrscheinlich als einer der <types> und dann vom Server dementsprechend verarbeitet
-    @GET("/chunkput")
-    Call<Message> chunkPut(@Query("cid") String chunkID, @Query("type") String type, @Query("data") Object data);
+    @PUT("/chunkput")
+    Call<Message> chunkPut(@Body ChunkPutRequest p_chunkPutRequest);
 
-    @GET("/chunklist")
-    Call<ChunkRange>chunkList(@Query("nid") String nodeID);
+    @PUT("/chunklist")
+    Call<ChunkRange>chunkList(ChunkListRequest p_chunkListRequest);
 
-    @GET("/chunkdump")
-    Call<Message> chunkDump(@Query("cid") String chunkID, @Query("name") String name);
+    @PUT("/chunkdump")
+    Call<Message> chunkDump(@Body ChunkDumpRequest p_chunkDumpRequest);
 
-//    @GET("/chunklocklist")
-//    Call<Message>chunkLockList(@Query("nid") int nodeID);
-
-    @GET("/chunkremove")
-    Call<Message> chunkRemove(@Query("cid") String chunkID);
-
-
+    @PUT("/chunkremove")
+    Call<Message> chunkRemove(@Body ChunkRemoveRequest p_chunkRemoveRequest);
 
 }

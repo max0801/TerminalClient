@@ -7,4 +7,8 @@ public class Message {
     public String getMessage() {
         return message;
     }
+
+    public Message(String p_message) {
+        message = p_message;
+    }
 }

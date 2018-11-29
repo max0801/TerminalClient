@@ -6,4 +6,8 @@ public class APIError {
     public String getError() {
         return error;
     }
+
+    public APIError(String p_error) {
+        error = p_error;
+    }
 }

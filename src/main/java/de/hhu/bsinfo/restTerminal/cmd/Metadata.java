@@ -4,8 +4,8 @@ import de.hhu.bsinfo.restTerminal.AbstractCommand;
 import de.hhu.bsinfo.restTerminal.data.MetadataEntry;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
-import de.hhu.bsinfo.restTerminal.files.FileSaving;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
+import de.hhu.bsinfo.restTerminal.request.MetadataRequest;
 import de.hhu.bsinfo.restTerminal.rest.MetadataService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -23,28 +23,32 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 @ShellComponent
-public class Metadata extends AbstractCommand implements FileSaving {
-    private MetadataService metadataService = retrofit.create(MetadataService.class);
-    private String nid;
+public class Metadata extends AbstractCommand  {
+    private MetadataService metadataService = m_retrofit.create(MetadataService.class);
     private String folderPath = "Metadata" + File.separator;
     private String currentDateTime;
     private MetadataEntry metadataResponseOnePeer;
     private List<MetadataEntry> metadataResponseAllPeers;
     private String onSuccessMessage;
     private String errorMessage;
+    private boolean allPeers = false;
     private boolean print;
     private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
 
 
-    @ShellMethod(value = "Get summary of all or one superper's metadata", group = "Metadata Commands")
+    @ShellMethod(value = "Gets summary of all or one superpeer's metadata.",
+            group = "Metadata Commands")
     public void metadata(
-            @ShellOption(value = {"--nid", "-n"}, defaultValue = "",
+            @ShellOption(
+                    value = {"--nid", "-n"}, defaultValue = "",
                     help = "Node <nid> where the metadata is requested from")
-                @Pattern(regexp = NODE_REGEX, message = "Invalid NodeID") String nid) {
-        this.nid = nid;
+            @Pattern(regexp = NODE_REGEX, message = "Invalid NodeID")
+                    String nid) {
+
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                rootPath + folderPath, true);
+                m_rootPath + folderPath, true);
         if (nid.isEmpty()) {
+            allPeers = true;
             Call<List<MetadataEntry>> allEntries = metadataService.metadataFromAllPeers();
             Response<List<MetadataEntry>> response = null;
             try {
@@ -53,7 +57,7 @@ public class Metadata extends AbstractCommand implements FileSaving {
                 e.printStackTrace();
             }
             if (!response.isSuccessful()) {
-                APIError error = ErrorUtils.parseError(response, retrofit);
+                APIError error = ErrorUtils.parseError(response, m_retrofit);
                 errorMessage = error.getError();
                 saveErrorResponse();
             } else {
@@ -62,7 +66,7 @@ public class Metadata extends AbstractCommand implements FileSaving {
                 saveSuccessfulResponse();
             }
         } else {
-            Call<MetadataEntry> singleEntry = metadataService.metadataFromOnePeer(nid);
+            Call<MetadataEntry> singleEntry = metadataService.metadataFromOnePeer(new MetadataRequest(nid));
             Response<MetadataEntry> response = null;
             try {
                 response = singleEntry.execute();
@@ -70,7 +74,7 @@ public class Metadata extends AbstractCommand implements FileSaving {
                 e.printStackTrace();
             }
             if (!response.isSuccessful()) {
-                APIError error = ErrorUtils.parseError(response, retrofit);
+                APIError error = ErrorUtils.parseError(response, m_retrofit);
                 errorMessage = error.getError();
                 saveErrorResponse();
             } else {
@@ -86,8 +90,10 @@ public class Metadata extends AbstractCommand implements FileSaving {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(m_rootPath + folderPath
+                    + currentDateTime + "log.txt");
+            Files.write(logFilePath, errorMessage.getBytes(),
+                    StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
             e.printStackTrace();
@@ -97,11 +103,14 @@ public class Metadata extends AbstractCommand implements FileSaving {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
-            Files.write(logFilePath, onSuccessMessage.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(m_rootPath + folderPath
+                    + currentDateTime + "log.txt");
+            Files.write(logFilePath, onSuccessMessage.getBytes(),
+                    StandardOpenOption.CREATE);
 
-            if (nid.isEmpty()) {
-                Path dataFilePath = Paths.get(rootPath + folderPath + currentDateTime + "data.txt");
+            if (allPeers) {
+                Path dataFilePath = Paths.get(m_rootPath + folderPath
+                        + currentDateTime + "data.txt");
                 for (MetadataEntry entry : metadataResponseAllPeers) {
                     Files.write(dataFilePath, ("nid: " + entry.getNid()).getBytes(),
                             StandardOpenOption.APPEND);
@@ -109,11 +118,12 @@ public class Metadata extends AbstractCommand implements FileSaving {
                             StandardOpenOption.APPEND);
                 }
             } else {
-                Path dataFilePath = Paths.get(rootPath + folderPath + currentDateTime + "data.txt");
-                Files.write(dataFilePath, ("nid: " + metadataResponseOnePeer.getNid()).getBytes(),
-                        StandardOpenOption.APPEND);
-                Files.write(dataFilePath, ("metadata: " + metadataResponseOnePeer.getMetadata()).getBytes(),
-                        StandardOpenOption.APPEND);
+                Path dataFilePath = Paths.get(m_rootPath + folderPath
+                        + currentDateTime + "data.txt");
+                Files.write(dataFilePath, ("nid: " + metadataResponseOnePeer
+                                .getNid()).getBytes(), StandardOpenOption.APPEND);
+                Files.write(dataFilePath, ("metadata: " + metadataResponseOnePeer
+                                .getMetadata()).getBytes(), StandardOpenOption.APPEND);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -124,7 +134,7 @@ public class Metadata extends AbstractCommand implements FileSaving {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + folderPath + currentDateTime + "log.txt");
 
     }
 }

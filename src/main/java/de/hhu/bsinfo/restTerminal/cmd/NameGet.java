@@ -3,8 +3,8 @@ package de.hhu.bsinfo.restTerminal.cmd;
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
-import de.hhu.bsinfo.restTerminal.files.FileSaving;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
+import de.hhu.bsinfo.restTerminal.request.NameGetRequest;
 import de.hhu.bsinfo.restTerminal.rest.NameService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -20,25 +20,28 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 @ShellComponent
-public class NameGet extends AbstractCommand implements FileSaving {
-    private NameService nameService = retrofit.create(NameService.class);
-    private String name;
+public class NameGet extends AbstractCommand  {
+    private NameService nameService = m_retrofit.create(NameService.class);
     private String folderPath = "NameGet" + File.separator;
     private String currentDateTime;
     private String nameGetResponse;
     private String errorMessage;
     private String onSuccessMessage;
     private boolean print;
-    @ShellMethod(value = "Get chunk id of a named chunk", group = "Name Commands")
+    @ShellMethod(value = "Gets chunk id <cid> of a chunk with name <name>.",
+            group = "Name Commands")
     public void nameget(
-            @ShellOption(value = {"--name", "-n"}, help = "name of the chunk which is requested") String name,
-            @ShellOption(value = {"--print", "-p"},
-                    help = "print chunk to stdout", defaultValue = "false") boolean print) {
-        this.name = name;
+            @ShellOption(
+                    value = {"--name", "-n"},
+                    help = "name of the chunk which is requested") String name,
+            @ShellOption(
+                    value = {"--print", "-p"}, help = "print chunk to stdout",
+                    defaultValue = "false") boolean print) {
+
         this.print = print;
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                rootPath + folderPath, true);
-        Call<String> call = nameService.nameGet(name);
+                m_rootPath + folderPath, true);
+        Call<String> call = nameService.nameGet(new NameGetRequest(name));
         Response<String> response = null;
         try {
             response = call.execute();
@@ -46,7 +49,7 @@ public class NameGet extends AbstractCommand implements FileSaving {
             e.printStackTrace();
         }
         if (!response.isSuccessful()) {
-            APIError error = ErrorUtils.parseError(response, retrofit);
+            APIError error = ErrorUtils.parseError(response, m_retrofit);
             errorMessage = error.getError();
             saveErrorResponse();
         } else {
@@ -59,8 +62,10 @@ public class NameGet extends AbstractCommand implements FileSaving {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(m_rootPath + folderPath
+                    + currentDateTime + "log.txt");
+            Files.write(logFilePath, errorMessage.getBytes(),
+                    StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
             e.printStackTrace();
@@ -70,10 +75,14 @@ public class NameGet extends AbstractCommand implements FileSaving {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
-            Files.write(logFilePath, onSuccessMessage.getBytes(), StandardOpenOption.CREATE);
-            Path dataFilePath = Paths.get(rootPath + folderPath + currentDateTime + "data.txt");
-            Files.write(dataFilePath, nameGetResponse.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(m_rootPath +
+                    folderPath + currentDateTime + "log.txt");
+            Files.write(logFilePath, onSuccessMessage.getBytes(),
+                    StandardOpenOption.CREATE);
+            Path dataFilePath = Paths.get(m_rootPath + folderPath
+                    + currentDateTime + "data.txt");
+            Files.write(dataFilePath, nameGetResponse.getBytes(),
+                    StandardOpenOption.CREATE);
             if(print){
                 System.out.println(nameGetResponse);
             }
@@ -86,6 +95,6 @@ public class NameGet extends AbstractCommand implements FileSaving {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + folderPath + currentDateTime + "log.txt");
     }
 }

@@ -1,7 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 //@ShellComponent
-//public class Monitoring extends AbstractCommand implements FileSaving {
+//public class Monitoring extends AbstractCommand  {
 //    private MonitoringService monitoringService = retrofit.create(MonitoringService.class);
 //    private  String currentDateTime;
 //    private  MonitoringDataStructure MONITORING_RESPONSE;
@@ -42,7 +42,7 @@ package de.hhu.bsinfo.restTerminal.cmd;
 //
 //    @Override
 //    public void saveErrorResponse() throws IOException {
-//        Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+//        Path logFilePath = Paths.get(m_rootPath + folderPath + currentDateTime + "log.txt");
 //        Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
 //                        printErrorToTerminal();
 
@@ -50,10 +50,10 @@ package de.hhu.bsinfo.restTerminal.cmd;
 //
 //    @Override
 //    public void saveSuccessfulResponse() throws IOException {
-//        Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+//        Path logFilePath = Paths.get(m_rootPath + folderPath + currentDateTime + "log.txt");
 //        Files.write(logFilePath, onSuccessMessage.getBytes(), StandardOpenOption.CREATE);
 //
-////        Path dataFilePath = Paths.get(rootPath + folderPath + currentDateTime + "data.txt");
+////        Path dataFilePath = Paths.get(m_rootPath + folderPath + currentDateTime + "data.txt");
 ////        Files.write(dataFilePath, MONITORING_RESPONSE.getCpuLoads().toString().getBytes(), StandardOpenOption.CREATE);
 ////        Files.write(dataFilePath, String.valueOf(MONITORING_RESPONSE.getCpuUsage()).getBytes(), StandardOpenOption.CREATE);
 ////        Files.write(dataFilePath, MONITORING_RESPONSE.getDiskStats().toString().getBytes(), StandardOpenOption.CREATE);

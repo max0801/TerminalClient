@@ -4,8 +4,8 @@ import de.hhu.bsinfo.restTerminal.AbstractCommand;
 import de.hhu.bsinfo.restTerminal.data.NodeInfoRest;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
-import de.hhu.bsinfo.restTerminal.files.FileSaving;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
+import de.hhu.bsinfo.restTerminal.request.NodeInfoRequest;
 import de.hhu.bsinfo.restTerminal.rest.NodeService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -22,27 +22,30 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 @ShellComponent
-public class NodeInfo extends AbstractCommand implements FileSaving {
+public class NodeInfo extends AbstractCommand  {
     private String folderPath = "NodeInfo" + File.separator;
     private String currentDateTime;
     private NodeInfoRest nodeInfoResponse;
     private String errorMessage;
     private String onSuccessMessage;
-    private String nid;
     private NodeService nodeService;
     private boolean print;
     private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
 
-    @ShellMethod(value = "Get information about a node in the network", group = "Node Commands")
+    @ShellMethod(value = "Gets information about node <nid> in the network.",
+            group = "Node Commands")
     public void nodeinfo(
-            @ShellOption(value = {"--nid", "-n"}, help = "Node <nid> which info is requested")
-                @Pattern(regexp = NODE_REGEX, message = "Invalid NodeID") String nid) {
-        this.nid = nid;
+            @ShellOption(
+                    value = {"--nid", "-n"},
+                    help = "Node <nid> which info is requested")
+            @Pattern(
+                    regexp = NODE_REGEX, message = "Invalid NodeID")
+                    String nid) {
 
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                rootPath + folderPath, true);
-        nodeService = retrofit.create(NodeService.class);
-        Call<NodeInfoRest> call = nodeService.nodeInfo(nid);
+                m_rootPath + folderPath, true);
+        nodeService = m_retrofit.create(NodeService.class);
+        Call<NodeInfoRest> call = nodeService.nodeInfo(new NodeInfoRequest(nid));
         Response<NodeInfoRest> response = null;
         try {
             response = call.execute();
@@ -50,7 +53,7 @@ public class NodeInfo extends AbstractCommand implements FileSaving {
             e.printStackTrace();
         }
         if (!response.isSuccessful()) {
-            APIError error = ErrorUtils.parseError(response, retrofit);
+            APIError error = ErrorUtils.parseError(response, m_retrofit);
             errorMessage = error.getError();
             saveErrorResponse();
         } else {
@@ -64,8 +67,10 @@ public class NodeInfo extends AbstractCommand implements FileSaving {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(m_rootPath + folderPath
+                    + currentDateTime + "log.txt");
+            Files.write(logFilePath, errorMessage.getBytes(),
+                    StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
             e.printStackTrace();
@@ -75,12 +80,15 @@ public class NodeInfo extends AbstractCommand implements FileSaving {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
-            Files.write(logFilePath, onSuccessMessage.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(m_rootPath + folderPath
+                    + currentDateTime + "log.txt");
+            Files.write(logFilePath, onSuccessMessage.getBytes(),
+                    StandardOpenOption.CREATE);
 
-            Path dataFilePath = Paths.get(rootPath + folderPath + currentDateTime + "data.txt");
-            Files.write(dataFilePath, ("NodeInfo of Node: " + nid + System.lineSeparator()).getBytes(),
-                    StandardOpenOption.APPEND);
+            Path dataFilePath = Paths.get(m_rootPath + folderPath
+                    + currentDateTime + "data.txt");
+//            Files.write(dataFilePath, ("NodeInfo of Node: " + nid
+//                    + System.lineSeparator()).getBytes(), StandardOpenOption.APPEND);
 
             Files.write(dataFilePath, ("nid: " + nodeInfoResponse.getNid()).getBytes(),
                     StandardOpenOption.APPEND);
@@ -94,9 +102,10 @@ public class NodeInfo extends AbstractCommand implements FileSaving {
                     StandardOpenOption.APPEND);
             Files.write(dataFilePath, System.lineSeparator().getBytes(),
                     StandardOpenOption.APPEND);
-            Files.write(dataFilePath, ("capabilities: " + nodeInfoResponse.getCapabilities()).getBytes(),
+            Files.write(dataFilePath, ("capabilities: " +
+                    nodeInfoResponse.getCapabilities()).getBytes(), StandardOpenOption.APPEND);
+            Files.write(dataFilePath, System.lineSeparator().getBytes(),
                     StandardOpenOption.APPEND);
-            Files.write(dataFilePath, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -107,6 +116,6 @@ public class NodeInfo extends AbstractCommand implements FileSaving {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + folderPath + currentDateTime + "log.txt");
     }
 }

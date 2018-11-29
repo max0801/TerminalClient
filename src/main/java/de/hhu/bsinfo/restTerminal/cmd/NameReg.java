@@ -4,8 +4,8 @@ import de.hhu.bsinfo.restTerminal.AbstractCommand;
 import de.hhu.bsinfo.restTerminal.data.Message;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
-import de.hhu.bsinfo.restTerminal.files.FileSaving;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
+import de.hhu.bsinfo.restTerminal.request.NameRegRequest;
 import de.hhu.bsinfo.restTerminal.rest.NameService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -23,27 +23,28 @@ import java.nio.file.StandardOpenOption;
 
 
 @ShellComponent
-public class NameReg extends AbstractCommand implements FileSaving {
-    private NameService nameService = retrofit.create(NameService.class);
+public class NameReg extends AbstractCommand  {
+    private NameService nameService = m_retrofit.create(NameService.class);
     private String folderPath = "NameReg" + File.separator;
     private String currentDateTime;
     private Message nameRegResponse;
     private String errorMessage;
-    private String cid;
-    private String name;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
-    @ShellMethod(value = "register chunk <cid> with <name>", group = "Name Commands")
+    @ShellMethod(value = "Registers chunk <cid> with name <name>.",
+            group = "Name Commands")
     public void namereg(
-            @ShellOption(value = {"--cid", "-c"}, help = "chunk <cid> which is named")
-                @Pattern(regexp = CHUNK_REGEX, message = "Invalid ChunkID") String cid,
-            @ShellOption(value = {"--name", "-n"}, help = "name of the chunk") String name) {
-        this.cid = cid;
-        this.name = name;
-        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                rootPath + folderPath, false);
-        nameService = retrofit.create(NameService.class);
-        Call<Message> call = nameService.nameReg(cid, name);
+            @ShellOption(
+                    value = {"--cid", "-c"}, help = "chunk <cid> which is named")
+            @Pattern(regexp = CHUNK_REGEX, message = "Invalid ChunkID")
+                    String cid,
+            @ShellOption(
+                    value = {"--name", "-n"}, help = "name of the chunk")
+                    String name) {
+
+        currentDateTime =    FolderHierarchy.createDateTimeFolderHierarchy(
+                m_rootPath + folderPath, false);
+        Call<Message> call = nameService.nameReg(new NameRegRequest(cid, name));
         Response<Message> response = null;
         try {
             response = call.execute();
@@ -51,7 +52,7 @@ public class NameReg extends AbstractCommand implements FileSaving {
             e.printStackTrace();
         }
         if (!response.isSuccessful()) {
-            APIError error = ErrorUtils.parseError(response, retrofit);
+            APIError error = ErrorUtils.parseError(response, m_retrofit);
             errorMessage = error.getError();
             saveErrorResponse();
         } else {
@@ -64,14 +65,16 @@ public class NameReg extends AbstractCommand implements FileSaving {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + folderPath + currentDateTime + "log.txt");
     }
 
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(m_rootPath + folderPath
+                    + currentDateTime + "log.txt");
+            Files.write(logFilePath, errorMessage.getBytes(),
+                    StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
             e.printStackTrace();
@@ -81,11 +84,12 @@ public class NameReg extends AbstractCommand implements FileSaving {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+            Path logFilePath = Paths.get(m_rootPath + folderPath
+                    + currentDateTime + "log.txt");
             Files.write(logFilePath, nameRegResponse.getMessage().getBytes(),
                     StandardOpenOption.CREATE);
-            Files.write(logFilePath, (" for the following chunk id: " + cid).getBytes(),
-                    StandardOpenOption.APPEND);
+            //Files.write(logFilePath, (" for the following chunk id: " + cid).getBytes(),
+              //      StandardOpenOption.APPEND);
         } catch (IOException e) {
             e.printStackTrace();
         }

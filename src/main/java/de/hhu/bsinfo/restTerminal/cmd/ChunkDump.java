@@ -4,8 +4,8 @@ import de.hhu.bsinfo.restTerminal.AbstractCommand;
 import de.hhu.bsinfo.restTerminal.data.Message;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
-import de.hhu.bsinfo.restTerminal.files.FileSaving;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
+import de.hhu.bsinfo.restTerminal.request.ChunkDumpRequest;
 import de.hhu.bsinfo.restTerminal.rest.ChunkService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -22,28 +22,32 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 @ShellComponent
-public class ChunkDump extends AbstractCommand implements FileSaving {
-    private ChunkService chunkService = retrofit.create(ChunkService.class);
+public class ChunkDump extends AbstractCommand  {
+    private ChunkService chunkService = m_retrofit.create(ChunkService.class);
     private String folderPath = "ChunkDump" + File.separator;
     private String currentDateTime;
     private Message chunkDumpResponse;
     private String errorMessage;
-    private String filename;
-    private String cid;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
     private static final String FILENAME_REGEX = "^[^<>:|?*]*$";
-    @ShellMethod(value = "creates a filedump of <cid> saved as <name>", group = "Chunk Commands")
-    public void chunkdump(
-            @ShellOption(value = {"--filename", "-f"}, help = "filename of the dump")
-                    @Pattern(regexp = FILENAME_REGEX, message = "Invalid filename") String filename,
-            @ShellOption(value = {"--cid", "-c"}, help = "chunk of which a filedump is created")
-            @Pattern(regexp = CHUNK_REGEX, message = "Invalid ChunkID") String cid) {
-        this.filename = filename;
-        this.cid = cid;
-        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                rootPath + folderPath, false);
-        Call<Message> request = chunkService.chunkDump(cid, filename);
 
+    @ShellMethod(value = "Creates a filedump of <cid> saved as <filename>.",
+            group = "Chunk Commands")
+    public void chunkdump(
+            @ShellOption(
+                    value = {"--filename", "-f"}, help = "filename of the dump")
+            @Pattern(
+                    regexp = FILENAME_REGEX, message = "Invalid filename")
+                    String filename,
+            @ShellOption(
+                    value = {"--cid", "-c"},
+                    help = "chunk of which a filedump is created")
+            @Pattern(regexp = CHUNK_REGEX, message = "Invalid ChunkID")
+                    String cid) {
+
+        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
+                m_rootPath + folderPath, false);
+        Call<Message> request = chunkService.chunkDump(new ChunkDumpRequest(filename, cid));
         Response<Message> response = null;
         try {
             response = request.execute();
@@ -51,7 +55,7 @@ public class ChunkDump extends AbstractCommand implements FileSaving {
             e.printStackTrace();
         }
         if (!response.isSuccessful()) {
-            APIError error = ErrorUtils.parseError(response, retrofit);
+            APIError error = ErrorUtils.parseError(response, m_retrofit);
             errorMessage = error.getError();
             saveErrorResponse();
         } else {
@@ -63,8 +67,10 @@ public class ChunkDump extends AbstractCommand implements FileSaving {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(m_rootPath + folderPath
+                    + currentDateTime + "log.txt");
+            Files.write(logFilePath, errorMessage.getBytes(),
+                    StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
             e.printStackTrace();
@@ -74,8 +80,10 @@ public class ChunkDump extends AbstractCommand implements FileSaving {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
-            Files.write(logFilePath, chunkDumpResponse.getMessage().getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(m_rootPath + folderPath
+                    + currentDateTime + "log.txt");
+            Files.write(logFilePath, chunkDumpResponse.getMessage().getBytes(),
+                    StandardOpenOption.CREATE);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -85,6 +93,6 @@ public class ChunkDump extends AbstractCommand implements FileSaving {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: " +
-                rootPath + folderPath + currentDateTime + "log.txt");
+                m_rootPath + folderPath + currentDateTime + "log.txt");
     }
 }

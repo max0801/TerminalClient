@@ -1,21 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
-import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.files.FileSaving;
-import de.hhu.bsinfo.restTerminal.rest.LogService;
-import org.springframework.shell.standard.ShellComponent;
-import org.springframework.shell.standard.ShellMethod;
-import org.springframework.shell.standard.ShellOption;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-
 //@ShellComponent
-//public class LogInfo extends AbstractCommand implements FileSaving {
+//public class LogInfo extends AbstractCommand  {
 //    private LogService logService = retrofit.create(LogService.class);
 //    private String nid;
 //    private  String folderPath = "LogInfo"+ File.separator ;
@@ -57,17 +43,17 @@ import java.nio.file.StandardOpenOption;
 //
 //    @Override
 //    public void saveErrorResponse() throws IOException {
-//        Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+//        Path logFilePath = Paths.get(m_rootPath + folderPath + currentDateTime + "log.txt");
 //        Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
 //        printErrorToTerminal();
 //    }
 //
 //    @Override
 //    public void saveSuccessfulResponse() throws IOException {
-//        Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
+//        Path logFilePath = Paths.get(m_rootPath + folderPath + currentDateTime + "log.txt");
 //        Files.write(logFilePath, onSuccessMessage.getBytes(), StandardOpenOption.CREATE);
 //
-//        Path dataFilePath = Paths.get(rootPath + folderPath + currentDateTime + "data.txt");
+//        Path dataFilePath = Paths.get(m_rootPath + folderPath + currentDateTime + "data.txt");
 //        Files.write(dataFilePath, logInfoResponse.getBytes(), StandardOpenOption.CREATE);
 //    }
 //
@@ -75,6 +61,6 @@ import java.nio.file.StandardOpenOption;
 //    public void printErrorToTerminal() {
 //        System.out.println("ERROR");
 //        System.out.println("Please check out the following file: "
-//                + rootPath + folderPath + currentDateTime + "log.txt");
+//                + m_rootPath + folderPath + currentDateTime + "log.txt");
 //    }
 //}

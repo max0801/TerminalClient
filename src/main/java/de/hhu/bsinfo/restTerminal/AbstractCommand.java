@@ -6,13 +6,17 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import java.io.File;
 
 public abstract class AbstractCommand {
-    protected Retrofit retrofit = new Retrofit.Builder()
+    protected Retrofit m_retrofit = new Retrofit.Builder()
             .baseUrl("http://localhost:8009/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
-    protected String rootPath = System.getProperty("user.home") + File.separator + "RestTerminal"+ File.separator;
+    protected String m_rootPath = System.getProperty("user.home")
+            + File.separator + "RestTerminal"+ File.separator;
 
     public abstract void printErrorToTerminal();
 
+    public abstract void saveErrorResponse();
+
+    public abstract void saveSuccessfulResponse();
 
 }

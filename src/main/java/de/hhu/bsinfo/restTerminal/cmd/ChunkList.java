@@ -4,8 +4,8 @@ import de.hhu.bsinfo.restTerminal.AbstractCommand;
 import de.hhu.bsinfo.restTerminal.data.ChunkRange;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
-import de.hhu.bsinfo.restTerminal.files.FileSaving;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
+import de.hhu.bsinfo.restTerminal.request.ChunkListRequest;
 import de.hhu.bsinfo.restTerminal.rest.ChunkService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -22,30 +22,33 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 @ShellComponent
-public class ChunkList extends AbstractCommand implements FileSaving {
-    private ChunkService chunkService = retrofit.create(ChunkService.class);
+public class ChunkList extends AbstractCommand  {
+    private ChunkService chunkService = m_retrofit.create(ChunkService.class);
     private String currentDateTime;
     private ChunkRange chunkListResponse;
     private String errorMessage;
     private String onSuccessMessage;
     private String folderPath = "ChunkList" + File.separator;
-    private String nid;
     private boolean print;
     private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
 
-    @ShellMethod(value = "list all chunks on node <nid>", group = "Chunk Commands")
+    @ShellMethod(value = "Lists all chunks on node <nid>.",
+            group = "Chunk Commands")
     public void chunklist(
-            @ShellOption(value = {"--nid", "-n"},
+            @ShellOption(
+                    value = {"--nid", "-n"},
                     help = "The node <nid> where the list of chunks is referring to")
-            @Pattern(regexp = NODE_REGEX, message = "Invalid NodeID") String nid,
-            @ShellOption(value = {"--print", "-p"},
-                    help = "print chunklist to stdout", defaultValue = "false") boolean print) {
+            @Pattern(
+                    regexp = NODE_REGEX, message = "Invalid NodeID") String nid,
+            @ShellOption(
+                    value = {"--print", "-p"},
+                    help = "print chunklist to stdout", defaultValue = "false")
+                    boolean print) {
 
-        this.nid = nid;
         this.print = print;
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                rootPath + folderPath, true);
-        Call<ChunkRange> call = chunkService.chunkList(nid);
+                m_rootPath + folderPath, true);
+        Call<ChunkRange> call = chunkService.chunkList(new ChunkListRequest(nid));
         Response<ChunkRange> response = null;
         try {
             response = call.execute();
@@ -53,7 +56,7 @@ public class ChunkList extends AbstractCommand implements FileSaving {
             e.printStackTrace();
         }
         if (!response.isSuccessful()) {
-            APIError error = ErrorUtils.parseError(response, retrofit);
+            APIError error = ErrorUtils.parseError(response, m_retrofit);
             errorMessage = error.getError();
             saveErrorResponse();
         } else {
@@ -66,8 +69,10 @@ public class ChunkList extends AbstractCommand implements FileSaving {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(m_rootPath + folderPath
+                    + currentDateTime + "log.txt");
+            Files.write(logFilePath, errorMessage.getBytes(),
+                    StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
             e.printStackTrace();
@@ -77,17 +82,23 @@ public class ChunkList extends AbstractCommand implements FileSaving {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
-            Files.write(logFilePath, onSuccessMessage.getBytes(), StandardOpenOption.CREATE);
-            Path dataFilePath = Paths.get(rootPath + folderPath + currentDateTime + "data.txt");
+            Path logFilePath = Paths.get(m_rootPath + folderPath
+                    + currentDateTime + "log.txt");
+            Files.write(logFilePath, onSuccessMessage.getBytes(),
+                    StandardOpenOption.CREATE);
+            Path dataFilePath = Paths.get(m_rootPath + folderPath
+                    + currentDateTime + "data.txt");
             Files.write(dataFilePath, chunkListResponse.getLocalChunkRanges().getBytes(),
                     StandardOpenOption.APPEND);
-            Files.write(dataFilePath, System.lineSeparator().getBytes(), StandardOpenOption.APPEND);
+            Files.write(dataFilePath, System.lineSeparator().getBytes(),
+                    StandardOpenOption.APPEND);
             Files.write(dataFilePath, chunkListResponse.getMigratedChunkRanges().getBytes(),
                     StandardOpenOption.APPEND);
             if (print) {
-                System.out.println("Local Chunk Ranges: " + chunkListResponse.getLocalChunkRanges());
-                System.out.println("Migrated Chunk Ranges: " + chunkListResponse.getMigratedChunkRanges());
+                System.out.println("Local Chunk Ranges: "
+                        + chunkListResponse.getLocalChunkRanges());
+                System.out.println("Migrated Chunk Ranges: "
+                        + chunkListResponse.getMigratedChunkRanges());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -99,7 +110,7 @@ public class ChunkList extends AbstractCommand implements FileSaving {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + folderPath + currentDateTime + "log.txt");
     }
 }
 

@@ -1,5 +1,4 @@
 package de.hhu.bsinfo.restTerminal.files;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,7 +25,7 @@ public class FolderHierarchy {
         String DATA = File.separator + "data";
 
         try {
-            Path rootPath = Paths.get(root);
+            Path m_rootPath = Paths.get(root);
             Path chunkCreate = Paths.get(dirChunkCreate);
             Path chunkDump = Paths.get(dirChunkDump);
             Path chunkGet = Paths.get(dirChunkGet);
@@ -38,7 +37,7 @@ public class FolderHierarchy {
             Path nodeList = Paths.get(dirNodeList);
             Path statsPrint = Paths.get(dirStatsPrint);
 
-            Files.createDirectories(rootPath);
+            Files.createDirectories(m_rootPath);
             Files.createDirectories(chunkCreate);
             Files.createDirectories(chunkDump);
             Files.createDirectories(chunkGet);

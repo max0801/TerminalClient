@@ -4,8 +4,8 @@ import de.hhu.bsinfo.restTerminal.AbstractCommand;
 import de.hhu.bsinfo.restTerminal.data.Message;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
-import de.hhu.bsinfo.restTerminal.files.FileSaving;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
+import de.hhu.bsinfo.restTerminal.request.ChunkCreateRequest;
 import de.hhu.bsinfo.restTerminal.rest.ChunkService;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -23,29 +23,33 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 @ShellComponent
-public class ChunkCreate extends AbstractCommand implements FileSaving {
-    private ChunkService chunkService = retrofit.create(ChunkService.class);
-    private String nid;
-    private int size;
-    private String folderPath = "ChunkCreate" + File.separator;
-    private String currentDateTime;
-    private Message chunkCreateResponse;
-    private String errorMessage;
+public class ChunkCreate extends AbstractCommand {
+    private ChunkService m_chunkService = m_retrofit.create(ChunkService.class);
+    private String m_folderPath = "ChunkCreate" + File.separator;
+    private String m_currentDateTime;
+    private Message m_chunkCreateResponse;
+    private String m_errorMessage;
     private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
 
-
-    @ShellMethod(value = "creates a chunk on node <nid> with size <size>", group = "Chunk Commands")
+    @ShellMethod(value = "Creates a chunk on node <nid> with size <size>.",
+            group = "Chunk Commands")
     public void chunkcreate(
-            @ShellOption(value = {"--nid", "-n"}, help = "Node <nid> of the created chunk")
-                @Pattern(regexp = NODE_REGEX, message = "Invalid NodeID") String nid,
-            @ShellOption(value = {"--size", "-s"}, defaultValue = "16",
-                    help = "size of the created chunk in byte") @Positive int size) {
-        this.nid = nid;
-        this.size = size;
+            @ShellOption(
+                    value = {"--nid", "-n"},
+                    help = "Node <nid> of the created chunk")
+            @Pattern(
+                    regexp = NODE_REGEX,
+                    message = "Regex Pattern: " + NODE_REGEX)
+                    String p_nid,
+            @ShellOption(
+                    value = {"--size", "-s"},
+                    defaultValue = "16",
+                    help = "size of the created chunk in byte")
+            @Positive int p_size) {
 
-        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                rootPath + folderPath, false);
-        Call<Message> call = chunkService.chunkCreate(nid, size);
+        m_currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
+                m_rootPath + m_folderPath, false);
+        Call<Message> call = m_chunkService.chunkCreate(new ChunkCreateRequest(p_nid, p_size));
         Response<Message> response = null;
         try {
             response = call.execute();
@@ -53,11 +57,11 @@ public class ChunkCreate extends AbstractCommand implements FileSaving {
             e.printStackTrace();
         }
         if (!response.isSuccessful()) {
-            APIError error = ErrorUtils.parseError(response, retrofit);
-            errorMessage = error.getError();
+            APIError error = ErrorUtils.parseError(response, m_retrofit);
+            m_errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            chunkCreateResponse = response.body();
+            m_chunkCreateResponse = response.body();
             saveSuccessfulResponse();
         }
     }
@@ -66,8 +70,10 @@ public class ChunkCreate extends AbstractCommand implements FileSaving {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath +
+                    m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_errorMessage.getBytes(),
+                    StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
             e.printStackTrace();
@@ -77,8 +83,11 @@ public class ChunkCreate extends AbstractCommand implements FileSaving {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(rootPath + folderPath + currentDateTime + "log.txt");
-            Files.write(logFilePath, chunkCreateResponse.getMessage().getBytes(), StandardOpenOption.CREATE);
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath,
+                    m_chunkCreateResponse.getMessage().getBytes(),
+                    StandardOpenOption.CREATE);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -88,6 +97,6 @@ public class ChunkCreate extends AbstractCommand implements FileSaving {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + m_folderPath + m_currentDateTime + "log.txt");
     }
 }
