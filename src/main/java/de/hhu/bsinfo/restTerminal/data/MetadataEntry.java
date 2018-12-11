@@ -1,19 +1,26 @@
 package de.hhu.bsinfo.restTerminal.data;
 
-public class MetadataEntry {
-    private String nid;
-    private String metadata;
+import com.google.gson.annotations.SerializedName;
 
-    public MetadataEntry(String nid, String metadata) {
-        this.nid = nid;
-        this.metadata = metadata;
+/**
+ * This class is used to save the metadata response body
+ */
+public class MetadataEntry {
+    @SerializedName("nid")
+    private String m_nid;
+    @SerializedName("metadata")
+    private String m_metadata;
+
+    public MetadataEntry(String p_nid, String p_metadata) {
+        this.m_nid = p_nid;
+        this.m_metadata = p_metadata;
     }
 
     public String getNid() {
-        return nid;
+        return m_nid;
     }
 
     public String getMetadata() {
-        return metadata;
+        return m_metadata;
     }
 }

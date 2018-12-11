@@ -9,9 +9,12 @@ import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
 import java.util.List;
-
+/**
+ * Representations of DXRAM-REST-API functions having to do
+ * with nodes in the current DXRAM instance
+ */
 public interface NodeService {
-    @PUT("/nodelist")
+    @GET("/nodelist")
     Call<List<String>> nodeList();
 
     @PUT("/nodeinfo")

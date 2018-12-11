@@ -2,6 +2,9 @@ package de.hhu.bsinfo.restTerminal.request;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Class for saving the parameters of an apprun request
+ */
 public class AppRunRequest {
     @SerializedName("nid")
     private String m_nid;

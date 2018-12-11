@@ -10,7 +10,9 @@ import retrofit2.http.Query;
 
 import java.util.List;
 
-//Metadata of Superpeers
+/**
+ * Representations of DXRAM-REST-API functions having to do with metadata
+ */
 public interface MetadataService {
     @PUT("/metadata")
     Call<MetadataEntry> metadataFromOnePeer(@Body MetadataRequest p_metadataRequest);

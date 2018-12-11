@@ -8,8 +8,11 @@ import retrofit2.http.*;
 
 import java.util.List;
 
+/**
+ * Representations of DXRAM-REST-API functions having to do with dxram applications
+ */
 public interface AppService {
-    @PUT("/applist")
+    @GET("/applist")
     Call<List<String>>appList();
 
     @PUT("/apprun")

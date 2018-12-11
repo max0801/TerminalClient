@@ -19,6 +19,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 
+
+/**
+ * Class for handling the applist command
+ */
 @ShellComponent
 public class AppList extends AbstractCommand  {
     private AppService appService = m_retrofit.create(AppService.class);
@@ -28,8 +32,16 @@ public class AppList extends AbstractCommand  {
     private List<String> appListResponse;
     private String errorMessage;
     private boolean print;
+
     @ShellMethod(value = "Lists available applications of DXRAM.",
             group = "App Commands")
+
+    /**
+     * prints the list of all dxram applications
+     *
+     * @param print if true prints the applist to stdout
+     *
+     */
     public void applist(
             @ShellOption(
                     value = {"--print", "-p"},

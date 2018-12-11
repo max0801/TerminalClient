@@ -6,6 +6,10 @@ import de.hhu.bsinfo.restTerminal.request.*;
 import retrofit2.Call;
 import retrofit2.http.*;
 
+/**
+ * Representations of DXRAM-REST-API functions having to do with the creation and
+ * modfication of chunks
+ */
 public interface ChunkService {
     @PUT("/chunkcreate")
     Call<Message> chunkCreate(@Body ChunkCreateRequest p_chunkCreateRequest);
@@ -17,7 +21,7 @@ public interface ChunkService {
     Call<Message> chunkPut(@Body ChunkPutRequest p_chunkPutRequest);
 
     @PUT("/chunklist")
-    Call<ChunkRange>chunkList(ChunkListRequest p_chunkListRequest);
+    Call<ChunkRange>chunkList(@Body ChunkListRequest p_chunkListRequest);
 
     @PUT("/chunkdump")
     Call<Message> chunkDump(@Body ChunkDumpRequest p_chunkDumpRequest);

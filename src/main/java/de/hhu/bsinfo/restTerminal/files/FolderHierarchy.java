@@ -7,7 +7,13 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * Class for the organization of data storage
+ */
 public class FolderHierarchy {
+    /**
+     * creates the folder system in the user's home directory
+     */
     public static void createFolderHierarchy() {
         String root = System.getProperty("user.home") + File.separator + "RestTerminal";
         String dirChunkCreate = root + File.separator + "ChunkCreate";
@@ -54,16 +60,22 @@ public class FolderHierarchy {
         }
     }
 
-    public static String createDateTimeFolderHierarchy(String path, boolean dataAndLog) {
+    /**
+     * creates a folder with a log file and as appropriate a data file
+     * @param p_path path where the folder is created
+     * @param p_dataAndLog determines if a log and a data file is created
+     * @return name of the created folder which is the current DateTime
+     */
+    public static String createDateTimeFolderHierarchy(String p_path, boolean p_dataAndLog) {
         String dateTime = null;
         try {
             dateTime = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").
                     format(new Date()) + File.separator;
-            String pathDateTime = path + dateTime + File.separator;
+            String pathDateTime = p_path + dateTime + File.separator;
             Path directory = Paths.get(pathDateTime);
             Files.createDirectories(directory);
             Files.createFile(Paths.get(pathDateTime + "log.txt"));
-            if (dataAndLog) {
+            if (p_dataAndLog) {
                 Files.createFile(Paths.get(pathDateTime + "data.txt"));
             }
         } catch (IOException e) {

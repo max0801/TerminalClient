@@ -22,6 +22,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 
+/**
+ * Class for handling the chunkput command
+ */
 @ShellComponent
 public class ChunkPut extends AbstractCommand {
     private ChunkService chunkService = m_retrofit.create(ChunkService.class);
@@ -31,6 +34,12 @@ public class ChunkPut extends AbstractCommand {
     private String errorMessage;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
+    /**
+     * stores data on a chunk
+     * @param cid chunk where data is saved
+     * @param data data which is stored on the chunk
+     * @param type data type of the stored data
+     */
     @ShellMethod(value = "Puts <data> with <type> on chunk <cid>.",
             group = "Chunk Commands")
     public void chunkput(
@@ -38,15 +47,18 @@ public class ChunkPut extends AbstractCommand {
                     value = {"--cid", "-c"},
                     help = "chunk ID of the submitted chunk")
             @Pattern(
-                    regexp = CHUNK_REGEX, message = "Invalid ChunkID") String cid,
+                    regexp = CHUNK_REGEX,
+                    message = "Regex Pattern: " + CHUNK_REGEX) String cid,
             @ShellOption(
                     value = {"--data", "-d"}, help = "data that is saved in the chunk")
                     Object data,
             @ShellOption(
                     value = {"--type", "-t"}, defaultValue = "str",
                     help = "type of the submitted chunk [str,byte,short,int,long]")
-            @Pattern(regexp = "str|long|int|byte|short",
-                    message = "Datatype is not supported") String type) {
+            @Pattern(
+                    regexp = "str|long|int|byte|short",
+                    message = "Supported datatypes: str,byte,short,int,long")
+                    String type) {
 
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, false);

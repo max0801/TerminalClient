@@ -21,6 +21,9 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 
+/**
+ * Class for handling the namelist command
+ */
 @ShellComponent
 public class NameList extends AbstractCommand  {
     private NameService nameService = m_retrofit.create(NameService.class);
@@ -30,8 +33,11 @@ public class NameList extends AbstractCommand  {
     private String onSuccessMessage;
     private String folderPath = "NameList" + File.separator;
     private boolean print;
-    @ShellMethod(value = "Gets namelist.", group = "Name Commands")
 
+    /**
+     * returns all chunks with their registered names
+     */
+    @ShellMethod(value = "Gets namelist.", group = "Name Commands")
     public void namelist() {
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, true);

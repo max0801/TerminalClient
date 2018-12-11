@@ -7,6 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.awt.*;
 import java.util.Locale;
 
+/**
+ * Starting point of the Spring Shell Application
+ */
 @SpringBootApplication
 public class TerminalMain {
     public static void main(final String[] p_args) {

@@ -21,33 +21,48 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
 
-
+/**
+ * Class for handling the statsprint command
+ */
 @ShellComponent
 public class StatsPrint extends AbstractCommand  {
-    private StatsService statsService;
+    private StatsService statsService = m_retrofit.create(StatsService.class);
     private String currentDateTime;
     private String statsPrintResponse;
     private String errorMessage;
     private String onSuccessMessage;
     private String folderPath = "StatsPrint" + File.separator;
 
+    /**
+     * shows dxram statistics in a browser window
+     * @param interval refresh interval parameter
+     */
     @ShellMethod(value = "Gets debug information every <interval> seconds.",
             group = "Statistics Commands")
     public void statsprint(
             @ShellOption(
-                    value = {"--interval", "-i"}, defaultValue = "10",
+                    value = {"--interval", "-i"}, //defaultValue = "10",
                     help = "Refresh interval parameter in seconds")
-                    int interval) {
+                    @Positive int interval) {
 
+        String stringInterval = String.valueOf(interval);
         m_retrofit = new Retrofit.Builder()
                 .baseUrl("http://localhost:8009/")
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .build();
-        statsService = m_retrofit.create(StatsService.class);
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, false);
-        Call<String> call = statsService.printStats(new StatsPrintRequest(interval));
+        JsonObject json = Json.createObjectBuilder()
+                .add("interval", stringInterval)
+                .build();
+
+        System.out.println(json);
+        Call<String> call = statsService.printStats(json.toString());
         Response<String> response = null;
         try {
             response = call.execute();
@@ -56,8 +71,7 @@ public class StatsPrint extends AbstractCommand  {
             System.exit(1);
         }
         if (!response.isSuccessful()) {
-            APIError error = ErrorUtils.parseError(response, m_retrofit);
-            errorMessage = error.getError();
+            errorMessage = response.body();
             saveErrorResponse();
         } else {
             onSuccessMessage = "Statistics are printed every " + interval + " seconds";
@@ -69,10 +83,10 @@ public class StatsPrint extends AbstractCommand  {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(),
-                    StandardOpenOption.CREATE);
+            File file = new File(m_rootPath + folderPath
+                    + currentDateTime + "error.html");
+            Files.write(file.toPath(), errorMessage.getBytes());
+            Desktop.getDesktop().browse(file.toURI());
             printErrorToTerminal();
         } catch (IOException e) {
             e.printStackTrace();

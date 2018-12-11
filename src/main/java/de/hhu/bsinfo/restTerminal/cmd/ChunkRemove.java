@@ -22,6 +22,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+/**
+ * Class for handling the chunkremove command
+ */
 @ShellComponent
 public class ChunkRemove extends AbstractCommand  {
     private ChunkService chunkService = m_retrofit.create(ChunkService.class);
@@ -31,14 +34,19 @@ public class ChunkRemove extends AbstractCommand  {
     private String errorMessage;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
-
+    /**
+     * deletes a chunk
+     * @param cid chunk which is deleted
+     */
     @ShellMethod(value = "Remove chunk with chunk id <cid>.",
             group = "Chunk Commands")
     public void chunkremove(
             @ShellOption(
                     value = {"--cid", "-c"},
                     help = "chunk that is supposed to be removed")
-            @Pattern(regexp = CHUNK_REGEX, message = "Invalid ChunkID")
+            @Pattern(
+                    regexp = CHUNK_REGEX,
+                    message = "Regex Pattern: "+ CHUNK_REGEX)
                     String cid) {
 
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(

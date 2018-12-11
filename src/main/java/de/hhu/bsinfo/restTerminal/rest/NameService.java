@@ -10,8 +10,11 @@ import retrofit2.http.GET;
 import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
+/**
+ * Representations of DXRAM-REST-API functions having to do with the naming of chunks
+ */
 public interface NameService  {
-    @PUT("/namelist")
+    @GET("/namelist")
     Call<NameListData> nameList();
 
     @PUT("/namereg")

@@ -21,17 +21,23 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+/**
+ * Class for handling the nodeinfo command
+ */
 @ShellComponent
-public class NodeInfo extends AbstractCommand  {
+public class NodeInfo extends AbstractCommand {
     private String folderPath = "NodeInfo" + File.separator;
     private String currentDateTime;
     private NodeInfoRest nodeInfoResponse;
     private String errorMessage;
     private String onSuccessMessage;
     private NodeService nodeService;
-    private boolean print;
     private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
 
+    /**
+     * requests information about a specific node
+     * @param nid node of which the information is requested
+     */
     @ShellMethod(value = "Gets information about node <nid> in the network.",
             group = "Node Commands")
     public void nodeinfo(
@@ -39,7 +45,8 @@ public class NodeInfo extends AbstractCommand  {
                     value = {"--nid", "-n"},
                     help = "Node <nid> which info is requested")
             @Pattern(
-                    regexp = NODE_REGEX, message = "Invalid NodeID")
+                    regexp = NODE_REGEX,
+                    message = "Regex Pattern: " + NODE_REGEX)
                     String nid) {
 
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(

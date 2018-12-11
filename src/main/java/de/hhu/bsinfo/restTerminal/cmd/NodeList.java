@@ -18,7 +18,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 
-
+/**
+ * Class for handling the nodelist command
+ */
 @ShellComponent
 public class NodeList extends AbstractCommand  {
     private String currentDateTime;
@@ -27,6 +29,10 @@ public class NodeList extends AbstractCommand  {
     private String onSuccessMessage;
     private String folderPath = "NodeList" + File.separator;
     private NodeService nodeService = m_retrofit.create(NodeService.class);
+
+    /**
+     * shows all nodes that are present in the current dxram instance
+     */
     @ShellMethod(value = "Gets nodelist.", group = "Node Commands")
     public void nodelist() {
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(

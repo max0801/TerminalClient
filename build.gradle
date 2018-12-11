@@ -41,5 +41,9 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     compile files('build/libs/dxram-0.5.0.jar')
     compile files('build/libs/dxrest-1.0.jar')
+    compile group: 'javax.json', name: 'javax.json-api', version: '1.0'
+    // https://mvnrepository.com/artifact/org.glassfish/javax.json
+    compile group: 'org.glassfish', name: 'javax.json', version: '1.0.4'
+
 }
 

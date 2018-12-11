@@ -22,6 +22,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 
+/**
+ * Class for handling the metadata command
+ */
 @ShellComponent
 public class Metadata extends AbstractCommand  {
     private MetadataService metadataService = m_retrofit.create(MetadataService.class);
@@ -35,14 +38,18 @@ public class Metadata extends AbstractCommand  {
     private boolean print;
     private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
 
-
+    /**
+     * requests metadata from either one specific superpeer or from all superpeers
+     * @param nid specific superpeer (optional)
+     */
     @ShellMethod(value = "Gets summary of all or one superpeer's metadata.",
             group = "Metadata Commands")
     public void metadata(
             @ShellOption(
                     value = {"--nid", "-n"}, defaultValue = "",
                     help = "Node <nid> where the metadata is requested from")
-            @Pattern(regexp = NODE_REGEX, message = "Invalid NodeID")
+            @Pattern(regexp = NODE_REGEX,
+                    message = "Regex Pattern: " + NODE_REGEX)
                     String nid) {
 
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(

@@ -20,6 +20,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+/**
+ * Class for handling the apprun command
+ */
 @ShellComponent
 public class AppRun extends AbstractCommand {
     private AppService appService = m_retrofit.create(AppService.class);
@@ -27,8 +30,15 @@ public class AppRun extends AbstractCommand {
     private String currentDateTime;
     private Message appRunResponse;
     private String errorMessage;
+
+    /**
+     * runs a dxram app on a specific node
+     * @param nid nodeID of the Node where the dxram app is started
+     * @param appName name of app that is supposed to be run
+     */
     @ShellMethod(value = "Starts application <app> on remote node <nid>.",
             group = "App Commands")
+
     public void apprun(
             @ShellOption(
                     value = {"--nid", "-n"},

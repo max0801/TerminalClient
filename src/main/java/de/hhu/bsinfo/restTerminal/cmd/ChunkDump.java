@@ -21,8 +21,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+/**
+ * Class for handling the chunkdump command
+ */
 @ShellComponent
-public class ChunkDump extends AbstractCommand  {
+public class ChunkDump extends AbstractCommand {
     private ChunkService chunkService = m_retrofit.create(ChunkService.class);
     private String folderPath = "ChunkDump" + File.separator;
     private String currentDateTime;
@@ -31,18 +34,26 @@ public class ChunkDump extends AbstractCommand  {
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
     private static final String FILENAME_REGEX = "^[^<>:|?*]*$";
 
+    /**
+     * creates a filedump of a chunk
+     * @param filename filename of the dump
+     * @param cid chunk which a filedump is made from
+     */
     @ShellMethod(value = "Creates a filedump of <cid> saved as <filename>.",
             group = "Chunk Commands")
     public void chunkdump(
             @ShellOption(
                     value = {"--filename", "-f"}, help = "filename of the dump")
             @Pattern(
-                    regexp = FILENAME_REGEX, message = "Invalid filename")
+                    regexp = FILENAME_REGEX,
+                    message = "Regex Pattern: " + FILENAME_REGEX)
                     String filename,
             @ShellOption(
                     value = {"--cid", "-c"},
                     help = "chunk of which a filedump is created")
-            @Pattern(regexp = CHUNK_REGEX, message = "Invalid ChunkID")
+            @Pattern(
+                    regexp = CHUNK_REGEX,
+                    message = "Regex Pattern: " + CHUNK_REGEX)
                     String cid) {
 
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(

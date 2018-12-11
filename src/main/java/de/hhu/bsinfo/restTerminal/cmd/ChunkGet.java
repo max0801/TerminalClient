@@ -20,7 +20,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
-
+/**
+ * Class for handling the chunkget command
+ */
 @ShellComponent
 public class ChunkGet extends AbstractCommand {
     private ChunkService chunkService = m_retrofit.create(ChunkService.class);
@@ -32,6 +34,12 @@ public class ChunkGet extends AbstractCommand {
     private boolean print;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
+    /**
+     * requests the content of a chunk
+     * @param cid chunk which is requested
+     * @param type representation of the chunk data
+     * @param print if true, prints the content of chunk to stdout
+     */
     @ShellMethod(value = "Requests a chunk with chunk id <cid> and type <type>.",
             group = "Chunk Commands")
     public void chunkget(
@@ -39,7 +47,8 @@ public class ChunkGet extends AbstractCommand {
                     value = {"--cid", "-c"},
                     help = "chunk ID of the requested chunk")
             @Pattern(
-                    regexp = CHUNK_REGEX, message = "Invalid ChunkID")
+                    regexp = CHUNK_REGEX,
+                    message = "Regex Pattern: " + CHUNK_REGEX)
                     String cid,
             @ShellOption(
                     value = {"--type", "-t"}, defaultValue = "str",

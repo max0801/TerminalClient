@@ -6,7 +6,10 @@ import de.hhu.bsinfo.restTerminal.request.TestingRequest;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.PUT;
-
+/**
+ * Representations of DXRAM-REST-API functions having to do with
+ * testing the current DXRAM instance
+ */
 public interface TestingService {
     @PUT("/monitor")
     Call<MonitoringDataStructure> monitor(@Body TestingRequest p_testingRequest);

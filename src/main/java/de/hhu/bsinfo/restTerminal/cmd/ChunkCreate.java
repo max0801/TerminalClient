@@ -22,6 +22,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+/**
+ * Class for handling the chunkcreate command
+ */
 @ShellComponent
 public class ChunkCreate extends AbstractCommand {
     private ChunkService m_chunkService = m_retrofit.create(ChunkService.class);
@@ -30,7 +33,14 @@ public class ChunkCreate extends AbstractCommand {
     private Message m_chunkCreateResponse;
     private String m_errorMessage;
     private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
+    private boolean print;
 
+    /**
+     * creates a chunk on a specific node with a certain size
+     * @param p_nid node where the chunk is created
+     * @param p_size size of the created chunk
+     * @param print if true, prints the chunk id of the allocated chunk to stdout
+     */
     @ShellMethod(value = "Creates a chunk on node <nid> with size <size>.",
             group = "Chunk Commands")
     public void chunkcreate(
@@ -45,8 +55,13 @@ public class ChunkCreate extends AbstractCommand {
                     value = {"--size", "-s"},
                     defaultValue = "16",
                     help = "size of the created chunk in byte")
-            @Positive int p_size) {
-
+            @Positive int p_size,
+            @ShellOption(
+                    value = {"--print", "-p"},
+                    help = "prints chunk ID of the created chunk",
+                    defaultValue = "false")
+                    boolean print) {
+        this.print = print;
         m_currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + m_folderPath, false);
         Call<Message> call = m_chunkService.chunkCreate(new ChunkCreateRequest(p_nid, p_size));
@@ -88,6 +103,9 @@ public class ChunkCreate extends AbstractCommand {
             Files.write(logFilePath,
                     m_chunkCreateResponse.getMessage().getBytes(),
                     StandardOpenOption.CREATE);
+            if(print){
+                System.out.println(m_chunkCreateResponse.getMessage());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

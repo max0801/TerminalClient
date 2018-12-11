@@ -1,14 +1,21 @@
 package de.hhu.bsinfo.restTerminal.data;
 
+import com.google.gson.annotations.SerializedName;
+
+/**
+ * This class represents an entry in a namelist
+ */
 public class NameListEntry {
-    private String name;
-    private String cid;
+    @SerializedName("name")
+    private String m_name;
+    @SerializedName("cid")
+    private String m_cid;
 
     public String getName() {
-        return name;
+        return m_name;
     }
 
     public String getCid() {
-        return cid;
+        return m_cid;
     }
 }

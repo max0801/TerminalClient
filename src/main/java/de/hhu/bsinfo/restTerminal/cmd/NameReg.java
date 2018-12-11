@@ -21,7 +21,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
-
+/**
+ * Class for handling the namereg command
+ */
 @ShellComponent
 public class NameReg extends AbstractCommand  {
     private NameService nameService = m_retrofit.create(NameService.class);
@@ -31,12 +33,19 @@ public class NameReg extends AbstractCommand  {
     private String errorMessage;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
+    /**
+     * registers a name for a specific chunk in order to address it easier
+     * @param cid chunk
+     * @param name registered name for the chunk
+     */
     @ShellMethod(value = "Registers chunk <cid> with name <name>.",
             group = "Name Commands")
     public void namereg(
             @ShellOption(
                     value = {"--cid", "-c"}, help = "chunk <cid> which is named")
-            @Pattern(regexp = CHUNK_REGEX, message = "Invalid ChunkID")
+            @Pattern(
+                    regexp = CHUNK_REGEX,
+                    message = "Regex Pattern: " + CHUNK_REGEX)
                     String cid,
             @ShellOption(
                     value = {"--name", "-n"}, help = "name of the chunk")

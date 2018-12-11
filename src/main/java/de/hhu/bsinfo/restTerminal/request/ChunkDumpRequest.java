@@ -2,6 +2,9 @@ package de.hhu.bsinfo.restTerminal.request;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Class for saving the parameters of a chunkdump request
+ */
 public class ChunkDumpRequest {
     @SerializedName("cid")
     private String m_cid;

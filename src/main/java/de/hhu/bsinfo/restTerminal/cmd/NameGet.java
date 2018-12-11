@@ -19,6 +19,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+/**
+ * Class for handling the nameget command
+ */
 @ShellComponent
 public class NameGet extends AbstractCommand  {
     private NameService nameService = m_retrofit.create(NameService.class);
@@ -28,6 +31,13 @@ public class NameGet extends AbstractCommand  {
     private String errorMessage;
     private String onSuccessMessage;
     private boolean print;
+
+    /**
+     * returns the corresponding chunk id of a named chunk
+     * @param name name of the chunk
+     * @param print if true, prints the chunk id to stdout
+     * @see de.hhu.bsinfo.restTerminal.cmd.NameReg
+     */
     @ShellMethod(value = "Gets chunk id <cid> of a chunk with name <name>.",
             group = "Name Commands")
     public void nameget(
@@ -35,7 +45,7 @@ public class NameGet extends AbstractCommand  {
                     value = {"--name", "-n"},
                     help = "name of the chunk which is requested") String name,
             @ShellOption(
-                    value = {"--print", "-p"}, help = "print chunk to stdout",
+                    value = {"--print", "-p"}, help = "prints chunk id to stdout",
                     defaultValue = "false") boolean print) {
 
         this.print = print;

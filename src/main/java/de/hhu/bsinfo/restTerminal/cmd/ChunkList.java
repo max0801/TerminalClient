@@ -21,8 +21,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+/**
+ * Class for handling the chunklist command
+ */
 @ShellComponent
-public class ChunkList extends AbstractCommand  {
+public class ChunkList extends AbstractCommand {
     private ChunkService chunkService = m_retrofit.create(ChunkService.class);
     private String currentDateTime;
     private ChunkRange chunkListResponse;
@@ -32,6 +35,11 @@ public class ChunkList extends AbstractCommand  {
     private boolean print;
     private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
 
+    /**
+     * requests the list of all registered chunks on a specific node
+     * @param nid node to which the chunklist is referring to
+     * @param print if true, prints list of all chunks to stdout
+     */
     @ShellMethod(value = "Lists all chunks on node <nid>.",
             group = "Chunk Commands")
     public void chunklist(
@@ -39,7 +47,8 @@ public class ChunkList extends AbstractCommand  {
                     value = {"--nid", "-n"},
                     help = "The node <nid> where the list of chunks is referring to")
             @Pattern(
-                    regexp = NODE_REGEX, message = "Invalid NodeID") String nid,
+                    regexp = NODE_REGEX,
+                    message = "Regex Pattern: " + NODE_REGEX) String nid,
             @ShellOption(
                     value = {"--print", "-p"},
                     help = "print chunklist to stdout", defaultValue = "false")
