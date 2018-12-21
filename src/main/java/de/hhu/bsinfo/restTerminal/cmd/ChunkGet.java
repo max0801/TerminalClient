@@ -1,7 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.ChunkGetResponse;
+import de.hhu.bsinfo.restTerminal.response.ChunkGetResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -39,7 +39,7 @@ public class ChunkGet extends AbstractCommand {
     /**
      * requests the content of a chunk
      * @param cid chunk which is requested
-     * @param type representation of the chunk data
+     * @param type representation of the chunk response
      * @param print if true, prints the content of chunk to stdout
      */
     @ShellMethod(value = "Requests a chunk with chunk id <cid> and type <type>.",
@@ -106,7 +106,7 @@ public class ChunkGet extends AbstractCommand {
             Files.write(logFilePath, onSuccessMessage.getBytes(),
                     StandardOpenOption.CREATE);
             Path dataFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "data.txt");
+                    + currentDateTime + "response.txt");
             Files.write(dataFilePath, String.valueOf(chunkGetResponse.getContent()).getBytes(),
                     StandardOpenOption.CREATE);
             if (print) {

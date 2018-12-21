@@ -1,7 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.NameListResponse;
+import de.hhu.bsinfo.restTerminal.response.NameListResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -80,7 +80,7 @@ public class NameList extends AbstractCommand {
                     StandardOpenOption.CREATE);
 
             Path dataFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "data.txt");
+                    + currentDateTime + "response.txt");
             Files.write(dataFilePath, ("NameList:" + System.lineSeparator()).getBytes(),
                     StandardOpenOption.APPEND);
 

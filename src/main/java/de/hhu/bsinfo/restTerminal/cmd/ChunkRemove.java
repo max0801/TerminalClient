@@ -26,7 +26,7 @@ import java.nio.file.StandardOpenOption;
  * Class for handling the chunkremove command
  */
 @ShellComponent
-public class ChunkRemove extends AbstractCommand  {
+public class ChunkRemove extends AbstractCommand {
     private ChunkService chunkService = m_retrofit.create(ChunkService.class);
     private String folderPath = "ChunkRemove" + File.separator;
     private String currentDateTime;
@@ -36,6 +36,7 @@ public class ChunkRemove extends AbstractCommand  {
 
     /**
      * deletes a chunk
+     *
      * @param cid chunk which is deleted
      */
     @ShellMethod(value = "Remove chunk with chunk id <cid>.",
@@ -46,7 +47,7 @@ public class ChunkRemove extends AbstractCommand  {
                     help = "chunk that is supposed to be removed")
             @Pattern(
                     regexp = CHUNK_REGEX,
-                    message = "Regex Pattern: "+ CHUNK_REGEX)
+                    message = "Regex Pattern: " + CHUNK_REGEX)
                     String cid) {
         long cidLong = ParsingCid.parse(cid);
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
@@ -63,7 +64,7 @@ public class ChunkRemove extends AbstractCommand  {
             errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            chunkRemoveResponse = "Removed succesful";
+            chunkRemoveResponse = "Chunk " + cid + " has been successfully removed";
             saveSuccessfulResponse();
         }
     }

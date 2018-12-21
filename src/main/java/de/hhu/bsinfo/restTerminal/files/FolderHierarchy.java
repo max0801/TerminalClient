@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Class for the organization of data storage
+ * Class for the organization of response storage
  */
 public class FolderHierarchy {
     /**
@@ -28,7 +28,7 @@ public class FolderHierarchy {
         String dirStatsPrint = root + File.separator + "StatsPrint";
 
         String LOG = File.separator + "log";
-        String DATA = File.separator + "data";
+        String DATA = File.separator + "response";
 
         try {
             Path m_rootPath = Paths.get(root);
@@ -61,9 +61,9 @@ public class FolderHierarchy {
     }
 
     /**
-     * creates a folder with a log file and as appropriate a data file
+     * creates a folder with a log file and as appropriate a response file
      * @param p_path path where the folder is created
-     * @param p_dataAndLog determines if a log and a data file is created
+     * @param p_dataAndLog determines if a log and a response file is created
      * @return name of the created folder which is the current DateTime
      */
     public static String createDateTimeFolderHierarchy(String p_path, boolean p_dataAndLog) {
@@ -76,7 +76,7 @@ public class FolderHierarchy {
             Files.createDirectories(directory);
             Files.createFile(Paths.get(pathDateTime + "log.txt"));
             if (p_dataAndLog) {
-                Files.createFile(Paths.get(pathDateTime + "data.txt"));
+                Files.createFile(Paths.get(pathDateTime + "response.txt"));
             }
         } catch (IOException e) {
             e.printStackTrace();

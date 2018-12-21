@@ -25,7 +25,7 @@ import java.nio.file.StandardOpenOption;
  * Class for handling the namereg command
  */
 @ShellComponent
-public class NameReg extends AbstractCommand  {
+public class NameReg extends AbstractCommand {
     private NameService nameService = m_retrofit.create(NameService.class);
     private String folderPath = "NameReg" + File.separator;
     private String currentDateTime;
@@ -35,7 +35,8 @@ public class NameReg extends AbstractCommand  {
 
     /**
      * registers a name for a specific chunk in order to address it easier
-     * @param cid chunk
+     *
+     * @param cid  chunk
      * @param name registered name for the chunk
      */
     @ShellMethod(value = "Registers chunk <cid> with name <name>.",
@@ -52,7 +53,7 @@ public class NameReg extends AbstractCommand  {
                     String name) {
         long cidLong = ParsingCid.parse(cid);
 
-        currentDateTime =    FolderHierarchy.createDateTimeFolderHierarchy(
+        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, false);
         Call<Void> call = nameService.nameReg(new NameRegRequest(cidLong, name));
         Response<Void> response = null;
@@ -66,7 +67,7 @@ public class NameReg extends AbstractCommand  {
             errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            nameRegResponse = "Registered";
+            nameRegResponse = "Registered chunk " + cid + " as " + name;
             saveSuccessfulResponse();
         }
     }
@@ -99,7 +100,7 @@ public class NameReg extends AbstractCommand  {
             Files.write(logFilePath, nameRegResponse.getBytes(),
                     StandardOpenOption.CREATE);
             //Files.write(logFilePath, (" for the following chunk id: " + cid).getBytes(),
-              //      StandardOpenOption.APPEND);
+            //      StandardOpenOption.APPEND);
         } catch (IOException e) {
             e.printStackTrace();
         }

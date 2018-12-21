@@ -35,12 +35,12 @@ public class ChunkPut extends AbstractCommand {
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
     /**
-     * stores data on a chunk
-     * @param cid chunk where data is saved
-     * @param data data which is stored on the chunk
-     * @param type data type of the stored data
+     * stores response on a chunk
+     * @param cid chunk where response is saved
+     * @param data response which is stored on the chunk
+     * @param type response type of the stored response
      */
-    @ShellMethod(value = "Puts <data> with <type> on chunk <cid>.",
+    @ShellMethod(value = "Puts <response> with <type> on chunk <cid>.",
             group = "Chunk Commands")
     public void chunkput(
             @ShellOption(
@@ -50,7 +50,7 @@ public class ChunkPut extends AbstractCommand {
                     regexp = CHUNK_REGEX,
                     message = "Regex Pattern: " + CHUNK_REGEX) String cid,
             @ShellOption(
-                    value = {"--data", "-d"}, help = "data that is saved in the chunk")
+                    value = {"--response", "-d"}, help = "response that is saved in the chunk")
                     Object data,
             @ShellOption(
                     value = {"--type", "-t"}, defaultValue = "str",
@@ -74,8 +74,8 @@ public class ChunkPut extends AbstractCommand {
             errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            //chunkPutResponse = response.body();
-            chunkPutResponse = "Put to Chunk succesful";
+            chunkPutResponse = "The following data has been succesfully put " +
+                    "on chunk "+ cid + ": "+ data;
             saveSuccessfulResponse();
         }
     }

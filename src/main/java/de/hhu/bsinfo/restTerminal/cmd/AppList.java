@@ -1,7 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.AppListResponse;
+import de.hhu.bsinfo.restTerminal.response.AppListResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -18,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.List;
 
 
 /**
@@ -91,7 +90,7 @@ public class AppList extends AbstractCommand  {
             Files.write(logFilePath, onSuccessMessage.getBytes(),
                     StandardOpenOption.CREATE);
             Path dataFilePath = Paths.get(m_rootPath + folderPath +
-                    currentDateTime + "data.txt");
+                    currentDateTime + "response.txt");
             for (String app : appListResponse.getApplist()) {
                 if(print){
                     System.out.println(app);

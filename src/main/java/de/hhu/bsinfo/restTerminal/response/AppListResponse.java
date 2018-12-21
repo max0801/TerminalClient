@@ -1,6 +1,4 @@
-package de.hhu.bsinfo.restTerminal.data;
-
-import com.google.gson.annotations.SerializedName;
+package de.hhu.bsinfo.restTerminal.response;
 
 import java.util.List;
 

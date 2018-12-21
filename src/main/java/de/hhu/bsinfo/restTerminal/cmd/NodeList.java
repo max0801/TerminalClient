@@ -1,7 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.NodeListResponse;
+import de.hhu.bsinfo.restTerminal.response.NodeListResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -17,7 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.List;
 
 /**
  * Class for handling the nodelist command
@@ -78,7 +77,7 @@ public class NodeList extends AbstractCommand  {
                     StandardOpenOption.CREATE);
 
             Path dataFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "data.txt");
+                    + currentDateTime + "response.txt");
             Files.write(dataFilePath, ("NodeList:" + System.lineSeparator()).getBytes(),
                     StandardOpenOption.APPEND);
 

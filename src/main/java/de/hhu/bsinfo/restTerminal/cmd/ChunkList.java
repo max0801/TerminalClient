@@ -1,7 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.ChunkListResponse;
+import de.hhu.bsinfo.restTerminal.response.ChunkListResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -96,7 +96,7 @@ public class ChunkList extends AbstractCommand {
             Files.write(logFilePath, onSuccessMessage.getBytes(),
                     StandardOpenOption.CREATE);
             Path dataFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "data.txt");
+                    + currentDateTime + "response.txt");
             Files.write(dataFilePath, chunkListResponse.getLocalChunkRanges().getBytes(),
                     StandardOpenOption.APPEND);
             Files.write(dataFilePath, System.lineSeparator().getBytes(),

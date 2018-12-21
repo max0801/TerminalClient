@@ -1,7 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.NodeInfoResponse;
+import de.hhu.bsinfo.restTerminal.response.NodeInfoResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -93,7 +93,7 @@ public class NodeInfo extends AbstractCommand {
                     StandardOpenOption.CREATE);
 
             Path dataFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "data.txt");
+                    + currentDateTime + "response.txt");
 //            Files.write(dataFilePath, ("NodeInfo of Node: " + nid
 //                    + System.lineSeparator()).getBytes(), StandardOpenOption.APPEND);
 

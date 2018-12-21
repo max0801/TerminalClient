@@ -1,6 +1,6 @@
 package de.hhu.bsinfo.restTerminal.rest;
 
-import de.hhu.bsinfo.restTerminal.data.*;
+import de.hhu.bsinfo.restTerminal.response.*;
 import de.hhu.bsinfo.restTerminal.request.*;
 import retrofit2.Call;
 import retrofit2.http.*;

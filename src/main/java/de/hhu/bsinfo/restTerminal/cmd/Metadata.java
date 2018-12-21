@@ -1,8 +1,8 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.MetadataResponseAllPeers;
-import de.hhu.bsinfo.restTerminal.data.MetadataResponseOnePeer;
+import de.hhu.bsinfo.restTerminal.response.MetadataResponseAllPeers;
+import de.hhu.bsinfo.restTerminal.response.MetadataResponseOnePeer;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -117,7 +117,7 @@ public class Metadata extends AbstractCommand  {
 
             if (allPeers) {
                 Path dataFilePath = Paths.get(m_rootPath + folderPath
-                        + currentDateTime + "data.txt");
+                        + currentDateTime + "response.txt");
                 for (MetadataResponseOnePeer entry : metadataResponseAllPeers.getMetadata()) {
                     Files.write(dataFilePath, ("nid: " + entry.getNid()).getBytes(),
                             StandardOpenOption.APPEND);
@@ -126,7 +126,7 @@ public class Metadata extends AbstractCommand  {
                 }
             } else {
                 Path dataFilePath = Paths.get(m_rootPath + folderPath
-                        + currentDateTime + "data.txt");
+                        + currentDateTime + "response.txt");
                 Files.write(dataFilePath, ("nid: " + metadataResponseOnePeer
                                 .getNid()).getBytes(), StandardOpenOption.APPEND);
                 Files.write(dataFilePath, ("metadata: " + metadataResponseOnePeer

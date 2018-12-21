@@ -1,7 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.StatsPrintResponse;
+import de.hhu.bsinfo.restTerminal.response.StatsPrintResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -12,8 +12,6 @@ import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import retrofit2.Call;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 import java.awt.*;
 import java.io.File;
@@ -22,9 +20,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 
 /**
@@ -99,7 +94,7 @@ public class StatsPrint extends AbstractCommand  {
             Files.write(logFilePath, onSuccessMessage.getBytes(),
                     StandardOpenOption.CREATE);
             File file = new File(m_rootPath + folderPath
-                    + currentDateTime + "data.html");
+                    + currentDateTime + "response.html");
             Files.write(file.toPath(), statsPrintResponse.getHtmlResponse().getBytes());
             Desktop.getDesktop().browse(file.toURI());
         } catch (IOException e) {

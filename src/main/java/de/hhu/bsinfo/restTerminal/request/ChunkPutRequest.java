@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
 public class ChunkPutRequest {
     @SerializedName("cid")
     private long m_cid;
-    @SerializedName("data")
+    @SerializedName("response")
     private Object m_data;
     @SerializedName("type")
     private String m_type;

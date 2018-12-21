@@ -1,4 +1,4 @@
-package de.hhu.bsinfo.restTerminal.data;
+package de.hhu.bsinfo.restTerminal.response;
 
 import java.util.List;
 

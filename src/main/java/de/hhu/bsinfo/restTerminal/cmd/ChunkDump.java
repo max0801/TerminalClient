@@ -70,7 +70,8 @@ public class ChunkDump extends AbstractCommand {
             errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            chunkDumpResponse = "Dump was succesful";
+            chunkDumpResponse = "Chunk "+ cid + " has been successfully dumped " +
+                    "with the filename "+ filename;
             saveSuccessfulResponse();
         }
     }

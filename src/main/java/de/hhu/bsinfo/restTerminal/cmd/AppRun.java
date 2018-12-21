@@ -62,7 +62,7 @@ public class AppRun extends AbstractCommand {
             errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            appRunResponse = "Started succesful";
+            appRunResponse = "DXRAM app "+ appName + " started succesful";
             saveSuccessfulResponse();
         }
     }

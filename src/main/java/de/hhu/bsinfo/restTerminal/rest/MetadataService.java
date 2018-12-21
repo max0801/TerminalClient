@@ -1,7 +1,7 @@
 package de.hhu.bsinfo.restTerminal.rest;
 
-import de.hhu.bsinfo.restTerminal.data.MetadataResponseAllPeers;
-import de.hhu.bsinfo.restTerminal.data.MetadataResponseOnePeer;
+import de.hhu.bsinfo.restTerminal.response.MetadataResponseAllPeers;
+import de.hhu.bsinfo.restTerminal.response.MetadataResponseOnePeer;
 import de.hhu.bsinfo.restTerminal.request.MetadataRequest;
 import retrofit2.Call;
 import retrofit2.http.Body;

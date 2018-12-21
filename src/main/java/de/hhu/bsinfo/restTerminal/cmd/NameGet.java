@@ -1,7 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.NameGetResponse;
+import de.hhu.bsinfo.restTerminal.response.NameGetResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -64,7 +64,7 @@ public class NameGet extends AbstractCommand  {
             errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            onSuccessMessage = "Chunk with the name " + name + " has been received";
+            onSuccessMessage = "Chunk id of chunk" + name + " has been received";
             nameGetResponse = response.body();
             saveSuccessfulResponse();
         }
@@ -91,7 +91,7 @@ public class NameGet extends AbstractCommand  {
             Files.write(logFilePath, onSuccessMessage.getBytes(),
                     StandardOpenOption.CREATE);
             Path dataFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "data.txt");
+                    + currentDateTime + "response.txt");
             Files.write(dataFilePath, (Long.toHexString(nameGetResponse.getCid())).getBytes(),
                     StandardOpenOption.CREATE);
             if(print){

@@ -1,13 +1,13 @@
-package de.hhu.bsinfo.restTerminal.data;
+package de.hhu.bsinfo.restTerminal.response;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ChunkCreateResponse {
+public class NameGetResponse {
     @SerializedName("cid")
     private long m_cid;
 
-    public ChunkCreateResponse(long p_cid) {
-        this.m_cid = p_cid;
+    public NameGetResponse(long p_cid) {
+        this.m_cid = m_cid;
     }
 
     public long getCid() {

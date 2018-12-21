@@ -1,7 +1,7 @@
 package de.hhu.bsinfo.restTerminal.rest;
 
-import de.hhu.bsinfo.restTerminal.data.NodeInfoResponse;
-import de.hhu.bsinfo.restTerminal.data.NodeListResponse;
+import de.hhu.bsinfo.restTerminal.response.NodeInfoResponse;
+import de.hhu.bsinfo.restTerminal.response.NodeListResponse;
 import de.hhu.bsinfo.restTerminal.request.NodeInfoRequest;
 import retrofit2.Call;
 import retrofit2.http.Body;

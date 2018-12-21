@@ -1,7 +1,7 @@
 package de.hhu.bsinfo.restTerminal.rest;
 
-import de.hhu.bsinfo.restTerminal.data.NameGetResponse;
-import de.hhu.bsinfo.restTerminal.data.NameListResponse;
+import de.hhu.bsinfo.restTerminal.response.NameGetResponse;
+import de.hhu.bsinfo.restTerminal.response.NameListResponse;
 import de.hhu.bsinfo.restTerminal.request.NameGetRequest;
 import de.hhu.bsinfo.restTerminal.request.NameRegRequest;
 import retrofit2.Call;
