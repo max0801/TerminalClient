@@ -1,7 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.NodeInfoRest;
+import de.hhu.bsinfo.restTerminal.data.NodeInfoResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -28,7 +28,7 @@ import java.nio.file.StandardOpenOption;
 public class NodeInfo extends AbstractCommand {
     private String folderPath = "NodeInfo" + File.separator;
     private String currentDateTime;
-    private NodeInfoRest nodeInfoResponse;
+    private NodeInfoResponse nodeInfoResponse;
     private String errorMessage;
     private String onSuccessMessage;
     private NodeService nodeService;
@@ -52,8 +52,8 @@ public class NodeInfo extends AbstractCommand {
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, true);
         nodeService = m_retrofit.create(NodeService.class);
-        Call<NodeInfoRest> call = nodeService.nodeInfo(new NodeInfoRequest(nid));
-        Response<NodeInfoRest> response = null;
+        Call<NodeInfoResponse> call = nodeService.nodeInfo(new NodeInfoRequest(nid));
+        Response<NodeInfoResponse> response = null;
         try {
             response = call.execute();
         } catch (IOException e) {

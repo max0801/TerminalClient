@@ -1,9 +1,11 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
+import de.hhu.bsinfo.restTerminal.data.ChunkGetResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
+import de.hhu.bsinfo.restTerminal.parsing.ParsingCid;
 import de.hhu.bsinfo.restTerminal.request.ChunkGetRequest;
 import de.hhu.bsinfo.restTerminal.rest.ChunkService;
 import org.springframework.shell.standard.ShellComponent;
@@ -29,7 +31,7 @@ public class ChunkGet extends AbstractCommand {
     private String folderPath = "ChunkGet" + File.separator;
     private String currentDateTime;
     private String onSuccessMessage;
-    private String chunkGetResponse;
+    private ChunkGetResponse chunkGetResponse;
     private String errorMessage;
     private boolean print;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
@@ -62,11 +64,11 @@ public class ChunkGet extends AbstractCommand {
                     defaultValue = "false") boolean print) {
 
         this.print = print;
-
+        long cidLong = ParsingCid.parse(cid);
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, true);
-        Call<String> call = chunkService.chunkGet(new ChunkGetRequest(cid, type));
-        Response<String> response = null;
+        Call<ChunkGetResponse> call = chunkService.chunkGet(new ChunkGetRequest(cidLong, type));
+        Response<ChunkGetResponse> response = null;
         try {
             response = call.execute();
         } catch (IOException e) {
@@ -105,10 +107,10 @@ public class ChunkGet extends AbstractCommand {
                     StandardOpenOption.CREATE);
             Path dataFilePath = Paths.get(m_rootPath + folderPath
                     + currentDateTime + "data.txt");
-            Files.write(dataFilePath, chunkGetResponse.getBytes(),
+            Files.write(dataFilePath, String.valueOf(chunkGetResponse.getContent()).getBytes(),
                     StandardOpenOption.CREATE);
             if (print) {
-                System.out.println("Content of Chunk: " + chunkGetResponse);
+                System.out.println("Content of Chunk: " + chunkGetResponse.getContent());
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,7 +1,6 @@
 package de.hhu.bsinfo.restTerminal.rest;
 
-import de.hhu.bsinfo.restTerminal.data.ChunkRange;
-import de.hhu.bsinfo.restTerminal.data.Message;
+import de.hhu.bsinfo.restTerminal.data.*;
 import de.hhu.bsinfo.restTerminal.request.*;
 import retrofit2.Call;
 import retrofit2.http.*;
@@ -12,21 +11,21 @@ import retrofit2.http.*;
  */
 public interface ChunkService {
     @PUT("/chunkcreate")
-    Call<Message> chunkCreate(@Body ChunkCreateRequest p_chunkCreateRequest);
+    Call<ChunkCreateResponse> chunkCreate(@Body ChunkCreateRequest p_chunkCreateRequest);
 
     @PUT ("/chunkget")
-    Call<String> chunkGet(@Body ChunkGetRequest p_chunkGetRequest);
+    Call<ChunkGetResponse> chunkGet(@Body ChunkGetRequest p_chunkGetRequest);
 
     @PUT("/chunkput")
-    Call<Message> chunkPut(@Body ChunkPutRequest p_chunkPutRequest);
+    Call<Void> chunkPut(@Body ChunkPutRequest p_chunkPutRequest);
 
     @PUT("/chunklist")
-    Call<ChunkRange>chunkList(@Body ChunkListRequest p_chunkListRequest);
+    Call<ChunkListResponse>chunkList(@Body ChunkListRequest p_chunkListRequest);
 
     @PUT("/chunkdump")
-    Call<Message> chunkDump(@Body ChunkDumpRequest p_chunkDumpRequest);
+    Call<Void> chunkDump(@Body ChunkDumpRequest p_chunkDumpRequest);
 
     @PUT("/chunkremove")
-    Call<Message> chunkRemove(@Body ChunkRemoveRequest p_chunkRemoveRequest);
+    Call<Void> chunkRemove(@Body ChunkRemoveRequest p_chunkRemoveRequest);
 
 }

@@ -1,6 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
+import de.hhu.bsinfo.restTerminal.data.NodeListResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -24,7 +25,7 @@ import java.util.List;
 @ShellComponent
 public class NodeList extends AbstractCommand  {
     private String currentDateTime;
-    private List<String> nodeListResponse;
+    private NodeListResponse nodeListResponse;
     private String errorMessage;
     private String onSuccessMessage;
     private String folderPath = "NodeList" + File.separator;
@@ -37,8 +38,8 @@ public class NodeList extends AbstractCommand  {
     public void nodelist() {
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, true);
-        Call<List<String>> call = nodeService.nodeList();
-        Response<List<String>> response = null;
+        Call <NodeListResponse> call = nodeService.nodeList();
+        Response<NodeListResponse>response = null;
         try {
             response = call.execute();
         } catch (IOException e) {
@@ -81,7 +82,7 @@ public class NodeList extends AbstractCommand  {
             Files.write(dataFilePath, ("NodeList:" + System.lineSeparator()).getBytes(),
                     StandardOpenOption.APPEND);
 
-            for (String node : nodeListResponse) {
+            for (String node : nodeListResponse.getNodes()) {
                 Files.write(dataFilePath, node.getBytes(),
                         StandardOpenOption.APPEND);
                 Files.write(dataFilePath, System.lineSeparator().getBytes(),

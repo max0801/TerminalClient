@@ -1,7 +1,6 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.Message;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -28,7 +27,7 @@ public class AppRun extends AbstractCommand {
     private AppService appService = m_retrofit.create(AppService.class);
     private String folderPath = "AppRun" + File.separator;
     private String currentDateTime;
-    private Message appRunResponse;
+    private String appRunResponse;
     private String errorMessage;
 
     /**
@@ -51,8 +50,8 @@ public class AppRun extends AbstractCommand {
 
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, false);
-       Call<Message> call = appService.appRun(new AppRunRequest(nid, appName));
-        Response<Message> response = null;
+       Call<Void> call = appService.appRun(new AppRunRequest(nid, appName));
+        Response<Void> response = null;
         try {
             response = call.execute();
         } catch (IOException e) {
@@ -63,7 +62,7 @@ public class AppRun extends AbstractCommand {
             errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            appRunResponse = response.body();
+            appRunResponse = "Started succesful";
             saveSuccessfulResponse();
         }
     }
@@ -86,7 +85,7 @@ public class AppRun extends AbstractCommand {
         try {
             Path logFilePath = Paths.get(m_rootPath + folderPath
                     + currentDateTime + "log.txt");
-            Files.write(logFilePath, appRunResponse.getMessage().getBytes(),
+            Files.write(logFilePath, appRunResponse.getBytes(),
                     StandardOpenOption.CREATE);
         } catch (IOException e) {
             e.printStackTrace();

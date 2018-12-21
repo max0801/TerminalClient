@@ -1,10 +1,10 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.Message;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
+import de.hhu.bsinfo.restTerminal.parsing.ParsingCid;
 import de.hhu.bsinfo.restTerminal.request.ChunkDumpRequest;
 import de.hhu.bsinfo.restTerminal.rest.ChunkService;
 import org.springframework.shell.standard.ShellComponent;
@@ -29,7 +29,7 @@ public class ChunkDump extends AbstractCommand {
     private ChunkService chunkService = m_retrofit.create(ChunkService.class);
     private String folderPath = "ChunkDump" + File.separator;
     private String currentDateTime;
-    private Message chunkDumpResponse;
+    private String chunkDumpResponse;
     private String errorMessage;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
     private static final String FILENAME_REGEX = "^[^<>:|?*]*$";
@@ -55,11 +55,11 @@ public class ChunkDump extends AbstractCommand {
                     regexp = CHUNK_REGEX,
                     message = "Regex Pattern: " + CHUNK_REGEX)
                     String cid) {
-
+        long cidLong = ParsingCid.parse(cid);
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, false);
-        Call<Message> request = chunkService.chunkDump(new ChunkDumpRequest(filename, cid));
-        Response<Message> response = null;
+        Call<Void> request = chunkService.chunkDump(new ChunkDumpRequest(filename, cidLong));
+        Response<Void> response = null;
         try {
             response = request.execute();
         } catch (IOException e) {
@@ -70,7 +70,7 @@ public class ChunkDump extends AbstractCommand {
             errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            chunkDumpResponse = response.body();
+            chunkDumpResponse = "Dump was succesful";
             saveSuccessfulResponse();
         }
     }
@@ -93,7 +93,7 @@ public class ChunkDump extends AbstractCommand {
         try {
             Path logFilePath = Paths.get(m_rootPath + folderPath
                     + currentDateTime + "log.txt");
-            Files.write(logFilePath, chunkDumpResponse.getMessage().getBytes(),
+            Files.write(logFilePath, chunkDumpResponse.getBytes(),
                     StandardOpenOption.CREATE);
         } catch (Exception e) {
             e.printStackTrace();

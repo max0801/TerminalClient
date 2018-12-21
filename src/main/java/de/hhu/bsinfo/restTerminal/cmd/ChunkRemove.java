@@ -1,10 +1,10 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.Message;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
+import de.hhu.bsinfo.restTerminal.parsing.ParsingCid;
 import de.hhu.bsinfo.restTerminal.request.ChunkPutRequest;
 import de.hhu.bsinfo.restTerminal.request.ChunkRemoveRequest;
 import de.hhu.bsinfo.restTerminal.rest.ChunkService;
@@ -30,7 +30,7 @@ public class ChunkRemove extends AbstractCommand  {
     private ChunkService chunkService = m_retrofit.create(ChunkService.class);
     private String folderPath = "ChunkRemove" + File.separator;
     private String currentDateTime;
-    private Message chunkRemoveResponse;
+    private String chunkRemoveResponse;
     private String errorMessage;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
@@ -48,11 +48,11 @@ public class ChunkRemove extends AbstractCommand  {
                     regexp = CHUNK_REGEX,
                     message = "Regex Pattern: "+ CHUNK_REGEX)
                     String cid) {
-
+        long cidLong = ParsingCid.parse(cid);
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, false);
-        Call<Message> call = chunkService.chunkRemove(new ChunkRemoveRequest(cid));
-        Response<Message> response = null;
+        Call<Void> call = chunkService.chunkRemove(new ChunkRemoveRequest(cidLong));
+        Response<Void> response = null;
         try {
             response = call.execute();
         } catch (IOException e) {
@@ -63,7 +63,7 @@ public class ChunkRemove extends AbstractCommand  {
             errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            chunkRemoveResponse = response.body();
+            chunkRemoveResponse = "Removed succesful";
             saveSuccessfulResponse();
         }
     }
@@ -86,7 +86,7 @@ public class ChunkRemove extends AbstractCommand  {
         try {
             Path logFilePath = Paths.get(m_rootPath + folderPath
                     + currentDateTime + "log.txt");
-            Files.write(logFilePath, chunkRemoveResponse.getMessage().getBytes(),
+            Files.write(logFilePath, chunkRemoveResponse.getBytes(),
                     StandardOpenOption.CREATE);
         } catch (IOException e) {
             e.printStackTrace();

@@ -7,9 +7,9 @@ import com.google.gson.annotations.SerializedName;
  */
 public class ChunkRemoveRequest {
     @SerializedName("cid")
-    private String m_cid;
+    private long m_cid;
 
-    public ChunkRemoveRequest(String p_cid) {
+    public ChunkRemoveRequest(long p_cid) {
         m_cid = p_cid;
     }
 }

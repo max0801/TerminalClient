@@ -1,7 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.Message;
+import de.hhu.bsinfo.restTerminal.data.ChunkCreateResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -30,7 +30,7 @@ public class ChunkCreate extends AbstractCommand {
     private ChunkService m_chunkService = m_retrofit.create(ChunkService.class);
     private String m_folderPath = "ChunkCreate" + File.separator;
     private String m_currentDateTime;
-    private Message m_chunkCreateResponse;
+    private ChunkCreateResponse m_chunkCreateResponse;
     private String m_errorMessage;
     private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
     private boolean print;
@@ -64,8 +64,8 @@ public class ChunkCreate extends AbstractCommand {
         this.print = print;
         m_currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + m_folderPath, false);
-        Call<Message> call = m_chunkService.chunkCreate(new ChunkCreateRequest(p_nid, p_size));
-        Response<Message> response = null;
+        Call<ChunkCreateResponse> call = m_chunkService.chunkCreate(new ChunkCreateRequest(p_nid, p_size));
+        Response<ChunkCreateResponse> response = null;
         try {
             response = call.execute();
         } catch (IOException e) {
@@ -101,10 +101,10 @@ public class ChunkCreate extends AbstractCommand {
             Path logFilePath = Paths.get(m_rootPath + m_folderPath
                     + m_currentDateTime + "log.txt");
             Files.write(logFilePath,
-                    m_chunkCreateResponse.getMessage().getBytes(),
+                    Long.toHexString(m_chunkCreateResponse.getCid()).getBytes(),
                     StandardOpenOption.CREATE);
             if(print){
-                System.out.println(m_chunkCreateResponse.getMessage());
+                System.out.println(Long.toHexString(m_chunkCreateResponse.getCid()));
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,22 +1,21 @@
 package de.hhu.bsinfo.restTerminal.rest;
 
-import de.hhu.bsinfo.restTerminal.data.NodeInfoRest;
+import de.hhu.bsinfo.restTerminal.data.NodeInfoResponse;
+import de.hhu.bsinfo.restTerminal.data.NodeListResponse;
 import de.hhu.bsinfo.restTerminal.request.NodeInfoRequest;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.PUT;
-import retrofit2.http.Query;
 
-import java.util.List;
 /**
  * Representations of DXRAM-REST-API functions having to do
  * with nodes in the current DXRAM instance
  */
 public interface NodeService {
     @GET("/nodelist")
-    Call<List<String>> nodeList();
+    Call<NodeListResponse> nodeList();
 
     @PUT("/nodeinfo")
-    Call<NodeInfoRest> nodeInfo(@Body NodeInfoRequest p_nodeInfoRequest);
+    Call<NodeInfoResponse> nodeInfo(@Body NodeInfoRequest p_nodeInfoRequest);
 }

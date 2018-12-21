@@ -1,6 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
+import de.hhu.bsinfo.restTerminal.data.StatsPrintResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -33,7 +34,7 @@ import javax.validation.constraints.Positive;
 public class StatsPrint extends AbstractCommand  {
     private StatsService statsService = m_retrofit.create(StatsService.class);
     private String currentDateTime;
-    private String statsPrintResponse;
+    private StatsPrintResponse statsPrintResponse;
     private String errorMessage;
     private String onSuccessMessage;
     private String folderPath = "StatsPrint" + File.separator;
@@ -46,24 +47,15 @@ public class StatsPrint extends AbstractCommand  {
             group = "Statistics Commands")
     public void statsprint(
             @ShellOption(
-                    value = {"--interval", "-i"}, //defaultValue = "10",
+                    value = {"--interval", "-i"}, defaultValue = "10",
                     help = "Refresh interval parameter in seconds")
                     @Positive int interval) {
 
         String stringInterval = String.valueOf(interval);
-        m_retrofit = new Retrofit.Builder()
-                .baseUrl("http://localhost:8009/")
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .build();
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, false);
-        JsonObject json = Json.createObjectBuilder()
-                .add("interval", stringInterval)
-                .build();
-
-        System.out.println(json);
-        Call<String> call = statsService.printStats(json.toString());
-        Response<String> response = null;
+        Call<StatsPrintResponse> call = statsService.printStats(new StatsPrintRequest(stringInterval));
+        Response<StatsPrintResponse> response = null;
         try {
             response = call.execute();
         } catch (IOException e) {
@@ -71,7 +63,13 @@ public class StatsPrint extends AbstractCommand  {
             System.exit(1);
         }
         if (!response.isSuccessful()) {
-            errorMessage = response.body();
+            try {
+                System.out.println(response.errorBody().string());
+            } catch (IOException p_e) {
+                p_e.printStackTrace();
+            }
+            APIError error = ErrorUtils.parseError(response, m_retrofit);
+            errorMessage = error.getError();
             saveErrorResponse();
         } else {
             onSuccessMessage = "Statistics are printed every " + interval + " seconds";
@@ -102,7 +100,7 @@ public class StatsPrint extends AbstractCommand  {
                     StandardOpenOption.CREATE);
             File file = new File(m_rootPath + folderPath
                     + currentDateTime + "data.html");
-            Files.write(file.toPath(), statsPrintResponse.getBytes());
+            Files.write(file.toPath(), statsPrintResponse.getHtmlResponse().getBytes());
             Desktop.getDesktop().browse(file.toURI());
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,7 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.ChunkRange;
+import de.hhu.bsinfo.restTerminal.data.ChunkListResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -28,7 +28,7 @@ import java.nio.file.StandardOpenOption;
 public class ChunkList extends AbstractCommand {
     private ChunkService chunkService = m_retrofit.create(ChunkService.class);
     private String currentDateTime;
-    private ChunkRange chunkListResponse;
+    private ChunkListResponse chunkListResponse;
     private String errorMessage;
     private String onSuccessMessage;
     private String folderPath = "ChunkList" + File.separator;
@@ -57,8 +57,8 @@ public class ChunkList extends AbstractCommand {
         this.print = print;
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, true);
-        Call<ChunkRange> call = chunkService.chunkList(new ChunkListRequest(nid));
-        Response<ChunkRange> response = null;
+        Call<ChunkListResponse> call = chunkService.chunkList(new ChunkListRequest(nid));
+        Response<ChunkListResponse> response = null;
         try {
             response = call.execute();
         } catch (IOException e) {

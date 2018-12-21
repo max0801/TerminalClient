@@ -1,8 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.NameListData;
-import de.hhu.bsinfo.restTerminal.data.NameListEntry;
+import de.hhu.bsinfo.restTerminal.data.NameListResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -18,17 +17,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.List;
 
 
 /**
  * Class for handling the namelist command
  */
 @ShellComponent
-public class NameList extends AbstractCommand  {
+public class NameList extends AbstractCommand {
     private NameService nameService = m_retrofit.create(NameService.class);
     private String currentDateTime;
-    private NameListData nameListResponse;
+    private NameListResponse nameListResponse;
     private String errorMessage;
     private String onSuccessMessage;
     private String folderPath = "NameList" + File.separator;
@@ -41,8 +39,8 @@ public class NameList extends AbstractCommand  {
     public void namelist() {
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, true);
-        Call<NameListData> call = nameService.nameList();
-        Response<NameListData> response = null;
+        Call<NameListResponse> call = nameService.nameList();
+        Response<NameListResponse> response = null;
         try {
             response = call.execute();
         } catch (IOException e) {
@@ -83,14 +81,13 @@ public class NameList extends AbstractCommand  {
 
             Path dataFilePath = Paths.get(m_rootPath + folderPath
                     + currentDateTime + "data.txt");
-            List<NameListEntry> entries = nameListResponse.getEntries();
             Files.write(dataFilePath, ("NameList:" + System.lineSeparator()).getBytes(),
                     StandardOpenOption.APPEND);
 
-            for (NameListEntry entry : entries) {
+            for (NameListResponse.NamelistEntryRest entry: nameListResponse.getNamelist()) {
                 Files.write(dataFilePath, (entry.getName() + " -> ").getBytes(),
                         StandardOpenOption.APPEND);
-                Files.write(dataFilePath, (entry.getCid() +
+                Files.write(dataFilePath, (Long.toHexString(entry.getCid()) +
                         System.lineSeparator()).getBytes(), StandardOpenOption.APPEND);
                 Files.write(dataFilePath, System.lineSeparator().getBytes(),
                         StandardOpenOption.APPEND);

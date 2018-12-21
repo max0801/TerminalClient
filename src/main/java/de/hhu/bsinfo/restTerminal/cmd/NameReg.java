@@ -1,10 +1,10 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.Message;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
+import de.hhu.bsinfo.restTerminal.parsing.ParsingCid;
 import de.hhu.bsinfo.restTerminal.request.NameRegRequest;
 import de.hhu.bsinfo.restTerminal.rest.NameService;
 import org.springframework.shell.standard.ShellComponent;
@@ -29,7 +29,7 @@ public class NameReg extends AbstractCommand  {
     private NameService nameService = m_retrofit.create(NameService.class);
     private String folderPath = "NameReg" + File.separator;
     private String currentDateTime;
-    private Message nameRegResponse;
+    private String nameRegResponse;
     private String errorMessage;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
@@ -50,11 +50,12 @@ public class NameReg extends AbstractCommand  {
             @ShellOption(
                     value = {"--name", "-n"}, help = "name of the chunk")
                     String name) {
+        long cidLong = ParsingCid.parse(cid);
 
         currentDateTime =    FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, false);
-        Call<Message> call = nameService.nameReg(new NameRegRequest(cid, name));
-        Response<Message> response = null;
+        Call<Void> call = nameService.nameReg(new NameRegRequest(cidLong, name));
+        Response<Void> response = null;
         try {
             response = call.execute();
         } catch (IOException e) {
@@ -65,7 +66,7 @@ public class NameReg extends AbstractCommand  {
             errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            nameRegResponse = response.body();
+            nameRegResponse = "Registered";
             saveSuccessfulResponse();
         }
     }
@@ -95,7 +96,7 @@ public class NameReg extends AbstractCommand  {
         try {
             Path logFilePath = Paths.get(m_rootPath + folderPath
                     + currentDateTime + "log.txt");
-            Files.write(logFilePath, nameRegResponse.getMessage().getBytes(),
+            Files.write(logFilePath, nameRegResponse.getBytes(),
                     StandardOpenOption.CREATE);
             //Files.write(logFilePath, (" for the following chunk id: " + cid).getBytes(),
               //      StandardOpenOption.APPEND);

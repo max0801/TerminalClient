@@ -2,18 +2,15 @@ package de.hhu.bsinfo.restTerminal.data;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * This class is used to save the metadata response body
- */
-public class MetadataEntry {
+public class MetadataResponseOnePeer {
     @SerializedName("nid")
     private String m_nid;
     @SerializedName("metadata")
     private String m_metadata;
 
-    public MetadataEntry(String p_nid, String p_metadata) {
-        this.m_nid = p_nid;
-        this.m_metadata = p_metadata;
+    public MetadataResponseOnePeer(String p_nid, String p_metadata) {
+        m_nid = p_nid;
+        m_metadata = p_metadata;
     }
 
     public String getNid() {
@@ -24,3 +21,4 @@ public class MetadataEntry {
         return m_metadata;
     }
 }
+

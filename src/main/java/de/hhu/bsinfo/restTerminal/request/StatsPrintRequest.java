@@ -7,9 +7,9 @@ import com.google.gson.annotations.SerializedName;
  */
 public class StatsPrintRequest {
     @SerializedName("interval")
-    private int m_interval;
+    private String m_interval;
 
-    public StatsPrintRequest(int p_interval) {
+    public StatsPrintRequest(String p_interval) {
         m_interval = p_interval;
     }
 }

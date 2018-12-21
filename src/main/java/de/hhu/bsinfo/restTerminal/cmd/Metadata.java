@@ -1,7 +1,8 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.MetadataEntry;
+import de.hhu.bsinfo.restTerminal.data.MetadataResponseAllPeers;
+import de.hhu.bsinfo.restTerminal.data.MetadataResponseOnePeer;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -20,7 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.List;
 
 /**
  * Class for handling the metadata command
@@ -30,8 +30,8 @@ public class Metadata extends AbstractCommand  {
     private MetadataService metadataService = m_retrofit.create(MetadataService.class);
     private String folderPath = "Metadata" + File.separator;
     private String currentDateTime;
-    private MetadataEntry metadataResponseOnePeer;
-    private List<MetadataEntry> metadataResponseAllPeers;
+    private MetadataResponseOnePeer metadataResponseOnePeer;
+    private MetadataResponseAllPeers metadataResponseAllPeers;
     private String onSuccessMessage;
     private String errorMessage;
     private boolean allPeers = false;
@@ -46,7 +46,7 @@ public class Metadata extends AbstractCommand  {
             group = "Metadata Commands")
     public void metadata(
             @ShellOption(
-                    value = {"--nid", "-n"}, defaultValue = "",
+                    value = {"--nid", "-n"}, defaultValue = "0000",
                     help = "Node <nid> where the metadata is requested from")
             @Pattern(regexp = NODE_REGEX,
                     message = "Regex Pattern: " + NODE_REGEX)
@@ -54,10 +54,10 @@ public class Metadata extends AbstractCommand  {
 
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, true);
-        if (nid.isEmpty()) {
+        if (nid.equals("0000")) {
             allPeers = true;
-            Call<List<MetadataEntry>> allEntries = metadataService.metadataFromAllPeers();
-            Response<List<MetadataEntry>> response = null;
+            Call<MetadataResponseAllPeers> allEntries = metadataService.metadataFromAllPeers();
+            Response<MetadataResponseAllPeers> response = null;
             try {
                 response = allEntries.execute();
             } catch (IOException e) {
@@ -73,8 +73,8 @@ public class Metadata extends AbstractCommand  {
                 saveSuccessfulResponse();
             }
         } else {
-            Call<MetadataEntry> singleEntry = metadataService.metadataFromOnePeer(new MetadataRequest(nid));
-            Response<MetadataEntry> response = null;
+            Call<MetadataResponseOnePeer> singleEntry = metadataService.metadataFromOnePeer(new MetadataRequest(nid));
+            Response<MetadataResponseOnePeer> response = null;
             try {
                 response = singleEntry.execute();
             } catch (IOException e) {
@@ -118,7 +118,7 @@ public class Metadata extends AbstractCommand  {
             if (allPeers) {
                 Path dataFilePath = Paths.get(m_rootPath + folderPath
                         + currentDateTime + "data.txt");
-                for (MetadataEntry entry : metadataResponseAllPeers) {
+                for (MetadataResponseOnePeer entry : metadataResponseAllPeers.getMetadata()) {
                     Files.write(dataFilePath, ("nid: " + entry.getNid()).getBytes(),
                             StandardOpenOption.APPEND);
                     Files.write(dataFilePath, ("metadata: " + entry.getMetadata()).getBytes(),

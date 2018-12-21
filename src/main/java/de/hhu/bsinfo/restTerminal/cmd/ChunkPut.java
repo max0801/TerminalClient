@@ -1,10 +1,10 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
-import de.hhu.bsinfo.restTerminal.data.Message;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
+import de.hhu.bsinfo.restTerminal.parsing.ParsingCid;
 import de.hhu.bsinfo.restTerminal.request.ChunkPutRequest;
 import de.hhu.bsinfo.restTerminal.rest.ChunkService;
 import org.springframework.shell.standard.ShellComponent;
@@ -30,7 +30,7 @@ public class ChunkPut extends AbstractCommand {
     private ChunkService chunkService = m_retrofit.create(ChunkService.class);
     private String folderPath = "ChunkPut" + File.separator;
     private String currentDateTime;
-    private Message chunkPutResponse;
+    private String chunkPutResponse;
     private String errorMessage;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
@@ -59,11 +59,11 @@ public class ChunkPut extends AbstractCommand {
                     regexp = "str|long|int|byte|short",
                     message = "Supported datatypes: str,byte,short,int,long")
                     String type) {
-
+        long cidLong = ParsingCid.parse(cid);
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, false);
-        Call<Message> call = chunkService.chunkPut(new ChunkPutRequest(cid, data, type));
-        Response<Message> response = null;
+        Call<Void> call = chunkService.chunkPut(new ChunkPutRequest(cidLong, data, type));
+        Response<Void> response = null;
         try {
             response = call.execute();
         } catch (IOException e) {
@@ -74,7 +74,8 @@ public class ChunkPut extends AbstractCommand {
             errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            chunkPutResponse = response.body();
+            //chunkPutResponse = response.body();
+            chunkPutResponse = "Put to Chunk succesful";
             saveSuccessfulResponse();
         }
     }
@@ -97,7 +98,7 @@ public class ChunkPut extends AbstractCommand {
         try {
             Path logFilePath = Paths.get(m_rootPath + folderPath
                     + currentDateTime + "log.txt");
-            Files.write(logFilePath, chunkPutResponse.getMessage().getBytes(),
+            Files.write(logFilePath, chunkPutResponse.getBytes(),
                     StandardOpenOption.CREATE);
         } catch (IOException e) {
             e.printStackTrace();

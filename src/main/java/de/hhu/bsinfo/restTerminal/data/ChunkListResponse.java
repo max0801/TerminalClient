@@ -2,20 +2,22 @@ package de.hhu.bsinfo.restTerminal.data;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * This class is used to save the content of a chunklist response body
- */
-public class ChunkRange {
+public class ChunkListResponse {
     @SerializedName("localChunkRanges")
     private String m_localChunkRanges;
     @SerializedName("migratedChunkRanges")
     private String m_migratedChunkRanges;
 
-    public String getMigratedChunkRanges() {
-        return m_migratedChunkRanges;
+    public ChunkListResponse(String p_localChunkRanges, String p_migratedChunkRanges) {
+        m_localChunkRanges = p_localChunkRanges;
+        m_migratedChunkRanges = p_migratedChunkRanges;
     }
 
     public String getLocalChunkRanges() {
         return m_localChunkRanges;
+    }
+
+    public String getMigratedChunkRanges() {
+        return m_migratedChunkRanges;
     }
 }

@@ -1,6 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
+import de.hhu.bsinfo.restTerminal.data.AppListResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -29,7 +30,7 @@ public class AppList extends AbstractCommand  {
     private String folderPath = "AppList" + File.separator;
     private String currentDateTime;
     private String onSuccessMessage;
-    private List<String> appListResponse;
+    private AppListResponse appListResponse;
     private String errorMessage;
     private boolean print;
 
@@ -51,8 +52,8 @@ public class AppList extends AbstractCommand  {
         this.print = print;
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, true);
-        Call<List<String>> call = appService.appList();
-        Response<List<String>> response = null;
+        Call<AppListResponse> call = appService.appList();
+        Response<AppListResponse> response = null;
         try {
             response = call.execute();
         } catch (IOException e) {
@@ -91,7 +92,7 @@ public class AppList extends AbstractCommand  {
                     StandardOpenOption.CREATE);
             Path dataFilePath = Paths.get(m_rootPath + folderPath +
                     currentDateTime + "data.txt");
-            for (String app : appListResponse) {
+            for (String app : appListResponse.getApplist()) {
                 if(print){
                     System.out.println(app);
                 }

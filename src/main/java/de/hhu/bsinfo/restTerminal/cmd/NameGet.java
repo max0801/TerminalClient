@@ -1,6 +1,7 @@
 package de.hhu.bsinfo.restTerminal.cmd;
 
 import de.hhu.bsinfo.restTerminal.AbstractCommand;
+import de.hhu.bsinfo.restTerminal.data.NameGetResponse;
 import de.hhu.bsinfo.restTerminal.error.APIError;
 import de.hhu.bsinfo.restTerminal.error.ErrorUtils;
 import de.hhu.bsinfo.restTerminal.files.FolderHierarchy;
@@ -27,7 +28,7 @@ public class NameGet extends AbstractCommand  {
     private NameService nameService = m_retrofit.create(NameService.class);
     private String folderPath = "NameGet" + File.separator;
     private String currentDateTime;
-    private String nameGetResponse;
+    private NameGetResponse nameGetResponse;
     private String errorMessage;
     private String onSuccessMessage;
     private boolean print;
@@ -51,8 +52,8 @@ public class NameGet extends AbstractCommand  {
         this.print = print;
         currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + folderPath, true);
-        Call<String> call = nameService.nameGet(new NameGetRequest(name));
-        Response<String> response = null;
+        Call<NameGetResponse> call = nameService.nameGet(new NameGetRequest(name));
+        Response<NameGetResponse> response = null;
         try {
             response = call.execute();
         } catch (IOException e) {
@@ -91,10 +92,10 @@ public class NameGet extends AbstractCommand  {
                     StandardOpenOption.CREATE);
             Path dataFilePath = Paths.get(m_rootPath + folderPath
                     + currentDateTime + "data.txt");
-            Files.write(dataFilePath, nameGetResponse.getBytes(),
+            Files.write(dataFilePath, (Long.toHexString(nameGetResponse.getCid())).getBytes(),
                     StandardOpenOption.CREATE);
             if(print){
-                System.out.println(nameGetResponse);
+                System.out.println(Long.toHexString(nameGetResponse.getCid()));
             }
         } catch (IOException e) {
             e.printStackTrace();
