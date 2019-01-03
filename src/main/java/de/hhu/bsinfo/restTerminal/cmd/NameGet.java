@@ -25,18 +25,18 @@ import java.nio.file.StandardOpenOption;
  */
 @ShellComponent
 public class NameGet extends AbstractCommand  {
-    private NameService nameService = m_retrofit.create(NameService.class);
-    private String folderPath = "NameGet" + File.separator;
-    private String currentDateTime;
-    private NameGetResponse nameGetResponse;
-    private String errorMessage;
-    private String onSuccessMessage;
-    private boolean print;
+    private NameService m_nameService = m_retrofit.create(NameService.class);
+    private String m_folderPath = "NameGet" + File.separator;
+    private String m_currentDateTime;
+    private NameGetResponse m_nameGetResponse;
+    private String m_errorMessage;
+    private String m_onSuccessMessage;
+    private boolean m_print;
 
     /**
      * returns the corresponding chunk id of a named chunk
-     * @param name name of the chunk
-     * @param print if true, prints the chunk id to stdout
+     * @param p_name name of the chunk
+     * @param p_print if true, prints the chunk id to stdout
      * @see de.hhu.bsinfo.restTerminal.cmd.NameReg
      */
     @ShellMethod(value = "Gets chunk id <cid> of a chunk with name <name>.",
@@ -44,15 +44,15 @@ public class NameGet extends AbstractCommand  {
     public void nameget(
             @ShellOption(
                     value = {"--name", "-n"},
-                    help = "name of the chunk which is requested") String name,
+                    help = "name of the chunk which is requested") String p_name,
             @ShellOption(
                     value = {"--print", "-p"}, help = "prints chunk id to stdout",
-                    defaultValue = "false") boolean print) {
+                    defaultValue = "false") boolean p_print) {
 
-        this.print = print;
-        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                m_rootPath + folderPath, true);
-        Call<NameGetResponse> call = nameService.nameGet(new NameGetRequest(name));
+        this.m_print = p_print;
+        m_currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
+                m_rootPath + m_folderPath, true);
+        Call<NameGetResponse> call = m_nameService.nameGet(new NameGetRequest(p_name));
         Response<NameGetResponse> response = null;
         try {
             response = call.execute();
@@ -61,11 +61,11 @@ public class NameGet extends AbstractCommand  {
         }
         if (!response.isSuccessful()) {
             APIError error = ErrorUtils.parseError(response, m_retrofit);
-            errorMessage = error.getError();
+            m_errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            onSuccessMessage = "Chunk id of chunk" + name + " has been received";
-            nameGetResponse = response.body();
+            m_onSuccessMessage = "Chunk id of chunk" + p_name + " has been received";
+            m_nameGetResponse = response.body();
             saveSuccessfulResponse();
         }
     }
@@ -73,9 +73,9 @@ public class NameGet extends AbstractCommand  {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_errorMessage.getBytes(),
                     StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
@@ -87,15 +87,15 @@ public class NameGet extends AbstractCommand  {
     public void saveSuccessfulResponse() {
         try {
             Path logFilePath = Paths.get(m_rootPath +
-                    folderPath + currentDateTime + "log.txt");
-            Files.write(logFilePath, onSuccessMessage.getBytes(),
+                    m_folderPath + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_onSuccessMessage.getBytes(),
                     StandardOpenOption.CREATE);
-            Path dataFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "response.txt");
-            Files.write(dataFilePath, (Long.toHexString(nameGetResponse.getCid())).getBytes(),
+            Path dataFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "response.txt");
+            Files.write(dataFilePath, (Long.toHexString(m_nameGetResponse.getCid())).getBytes(),
                     StandardOpenOption.CREATE);
-            if(print){
-                System.out.println(Long.toHexString(nameGetResponse.getCid()));
+            if(m_print){
+                System.out.println(Long.toHexString(m_nameGetResponse.getCid()));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -106,6 +106,6 @@ public class NameGet extends AbstractCommand  {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + m_rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + m_folderPath + m_currentDateTime + "log.txt");
     }
 }

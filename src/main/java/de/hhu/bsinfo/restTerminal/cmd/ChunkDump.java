@@ -26,18 +26,18 @@ import java.nio.file.StandardOpenOption;
  */
 @ShellComponent
 public class ChunkDump extends AbstractCommand {
-    private ChunkService chunkService = m_retrofit.create(ChunkService.class);
-    private String folderPath = "ChunkDump" + File.separator;
-    private String currentDateTime;
-    private String chunkDumpResponse;
-    private String errorMessage;
+    private ChunkService m_chunkService = m_retrofit.create(ChunkService.class);
+    private String m_folderPath = "ChunkDump" + File.separator;
+    private String m_currentDateTime;
+    private String m_chunkDumpResponse;
+    private String m_errorMessage;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
     private static final String FILENAME_REGEX = "^[^<>:|?*]*$";
 
     /**
      * creates a filedump of a chunk
-     * @param filename filename of the dump
-     * @param cid chunk which a filedump is made from
+     * @param p_filename p_filename of the dump
+     * @param p_cid chunk which a filedump is made from
      */
     @ShellMethod(value = "Creates a filedump of <cid> saved as <filename>.",
             group = "Chunk Commands")
@@ -47,18 +47,18 @@ public class ChunkDump extends AbstractCommand {
             @Pattern(
                     regexp = FILENAME_REGEX,
                     message = "Regex Pattern: " + FILENAME_REGEX)
-                    String filename,
+                    String p_filename,
             @ShellOption(
                     value = {"--cid", "-c"},
                     help = "chunk of which a filedump is created")
             @Pattern(
                     regexp = CHUNK_REGEX,
                     message = "Regex Pattern: " + CHUNK_REGEX)
-                    String cid) {
-        long cidLong = ParsingCid.parse(cid);
-        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                m_rootPath + folderPath, false);
-        Call<Void> request = chunkService.chunkDump(new ChunkDumpRequest(filename, cidLong));
+                    String p_cid) {
+        long cidLong = ParsingCid.parse(p_cid);
+        m_currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
+                m_rootPath + m_folderPath, false);
+        Call<Void> request = m_chunkService.chunkDump(new ChunkDumpRequest(p_filename, cidLong));
         Response<Void> response = null;
         try {
             response = request.execute();
@@ -67,11 +67,11 @@ public class ChunkDump extends AbstractCommand {
         }
         if (!response.isSuccessful()) {
             APIError error = ErrorUtils.parseError(response, m_retrofit);
-            errorMessage = error.getError();
+            m_errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            chunkDumpResponse = "Chunk "+ cid + " has been successfully dumped " +
-                    "with the filename "+ filename;
+            m_chunkDumpResponse = "Chunk "+ p_cid + " has been successfully dumped " +
+                    "with the p_filename "+ p_filename;
             saveSuccessfulResponse();
         }
     }
@@ -79,9 +79,9 @@ public class ChunkDump extends AbstractCommand {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_errorMessage.getBytes(),
                     StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
@@ -92,9 +92,9 @@ public class ChunkDump extends AbstractCommand {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, chunkDumpResponse.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_chunkDumpResponse.getBytes(),
                     StandardOpenOption.CREATE);
         } catch (Exception e) {
             e.printStackTrace();
@@ -105,6 +105,6 @@ public class ChunkDump extends AbstractCommand {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: " +
-                m_rootPath + folderPath + currentDateTime + "log.txt");
+                m_rootPath + m_folderPath + m_currentDateTime + "log.txt");
     }
 }

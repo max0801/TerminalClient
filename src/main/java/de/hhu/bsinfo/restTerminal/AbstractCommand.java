@@ -1,6 +1,8 @@
 package de.hhu.bsinfo.restTerminal;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -11,12 +13,13 @@ import java.io.File;
  */
 public abstract class AbstractCommand {
     //private String baseUrl = System.getProperty("BASE_URL");
-    //@Value("${app.baseurl}")
-    //private String baseUrl;
+    //@Value("${app.baseUrl}")
+    @Autowired
+    private Environment m_environment;
+    private String baseUrl = m_environment.getProperty("BASEURL");
     protected Retrofit m_retrofit = new Retrofit.Builder()
-            .baseUrl("http://localhost:8009/")
-            //.baseUrl(baseUrl)
-      //      .baseUrl(baseUrl)
+            //.baseUrl("http://localhost:8009/")
+            .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .build();
     protected String m_rootPath = System.getProperty("user.home")

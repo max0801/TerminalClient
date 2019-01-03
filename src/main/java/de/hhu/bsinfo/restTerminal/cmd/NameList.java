@@ -24,22 +24,21 @@ import java.nio.file.StandardOpenOption;
  */
 @ShellComponent
 public class NameList extends AbstractCommand {
-    private NameService nameService = m_retrofit.create(NameService.class);
-    private String currentDateTime;
-    private NameListResponse nameListResponse;
-    private String errorMessage;
-    private String onSuccessMessage;
-    private String folderPath = "NameList" + File.separator;
-    private boolean print;
+    private NameService m_nameService = m_retrofit.create(NameService.class);
+    private String m_currentDateTime;
+    private NameListResponse m_nameListResponse;
+    private String m_errorMessage;
+    private String m_onSuccessMessage;
+    private String m_folderPath = "NameList" + File.separator;
 
     /**
      * returns all chunks with their registered names
      */
     @ShellMethod(value = "Gets namelist.", group = "Name Commands")
     public void namelist() {
-        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                m_rootPath + folderPath, true);
-        Call<NameListResponse> call = nameService.nameList();
+        m_currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
+                m_rootPath + m_folderPath, true);
+        Call<NameListResponse> call = m_nameService.nameList();
         Response<NameListResponse> response = null;
         try {
             response = call.execute();
@@ -48,11 +47,11 @@ public class NameList extends AbstractCommand {
         }
         if (!response.isSuccessful()) {
             APIError error = ErrorUtils.parseError(response, m_retrofit);
-            errorMessage = error.getError();
+            m_errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            onSuccessMessage = "Namelist of all nodes has been received";
-            nameListResponse = response.body();
+            m_onSuccessMessage = "Namelist of all nodes has been received";
+            m_nameListResponse = response.body();
             saveSuccessfulResponse();
         }
     }
@@ -61,9 +60,9 @@ public class NameList extends AbstractCommand {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_errorMessage.getBytes(),
                     StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
@@ -74,17 +73,17 @@ public class NameList extends AbstractCommand {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, onSuccessMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_onSuccessMessage.getBytes(),
                     StandardOpenOption.CREATE);
 
-            Path dataFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "response.txt");
+            Path dataFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "response.txt");
             Files.write(dataFilePath, ("NameList:" + System.lineSeparator()).getBytes(),
                     StandardOpenOption.APPEND);
 
-            for (NameListResponse.NamelistEntryRest entry: nameListResponse.getNamelist()) {
+            for (NameListResponse.NamelistEntryRest entry: m_nameListResponse.getNamelist()) {
                 Files.write(dataFilePath, (entry.getName() + " -> ").getBytes(),
                         StandardOpenOption.APPEND);
                 Files.write(dataFilePath, (Long.toHexString(entry.getCid()) +
@@ -102,7 +101,7 @@ public class NameList extends AbstractCommand {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + m_rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + m_folderPath + m_currentDateTime + "log.txt");
     }
 }
 

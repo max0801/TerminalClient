@@ -24,16 +24,16 @@ import java.nio.file.StandardOpenOption;
  */
 @ShellComponent
 public class AppRun extends AbstractCommand {
-    private AppService appService = m_retrofit.create(AppService.class);
-    private String folderPath = "AppRun" + File.separator;
-    private String currentDateTime;
-    private String appRunResponse;
-    private String errorMessage;
+    private AppService m_appService = m_retrofit.create(AppService.class);
+    private String m_folderPath = "AppRun" + File.separator;
+    private String m_currentDateTime;
+    private String m_appRunResponse;
+    private String m_errorMessage;
 
     /**
      * runs a dxram app on a specific node
-     * @param nid nodeID of the Node where the dxram app is started
-     * @param appName name of app that is supposed to be run
+     * @param p_nid nodeID of the Node where the dxram app is started
+     * @param p_appName name of app that is supposed to be run
      */
     @ShellMethod(value = "Starts application <app> on remote node <nid>.",
             group = "App Commands")
@@ -42,15 +42,15 @@ public class AppRun extends AbstractCommand {
             @ShellOption(
                     value = {"--nid", "-n"},
                     help = "Node <nid> with all available applications")
-                    String nid,
+                    String p_nid,
             @ShellOption(
                     value = {"--app", "-a"},
                     help = "name of app that is supposed to be run")
-                    String appName) {
+                    String p_appName) {
 
-        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                m_rootPath + folderPath, false);
-       Call<Void> call = appService.appRun(new AppRunRequest(nid, appName));
+        m_currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
+                m_rootPath + m_folderPath, false);
+       Call<Void> call = m_appService.appRun(new AppRunRequest(p_nid, p_appName));
         Response<Void> response = null;
         try {
             response = call.execute();
@@ -59,10 +59,10 @@ public class AppRun extends AbstractCommand {
         }
         if (!response.isSuccessful()) {
             APIError error = ErrorUtils.parseError(response, m_retrofit);
-            errorMessage = error.getError();
+            m_errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            appRunResponse = "DXRAM app "+ appName + " started succesful";
+            m_appRunResponse = "DXRAM app "+ p_appName + " started succesful";
             saveSuccessfulResponse();
         }
     }
@@ -70,9 +70,9 @@ public class AppRun extends AbstractCommand {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_errorMessage.getBytes(),
                     StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
@@ -83,9 +83,9 @@ public class AppRun extends AbstractCommand {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, appRunResponse.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_appRunResponse.getBytes(),
                     StandardOpenOption.CREATE);
         } catch (IOException e) {
             e.printStackTrace();
@@ -95,7 +95,7 @@ public class AppRun extends AbstractCommand {
     @Override
     public void printErrorToTerminal() {
         System.out.println("ERRROR: Please check out the following file: "
-                + m_rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + m_folderPath + m_currentDateTime + "log.txt");
 
     }
 }

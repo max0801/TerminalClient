@@ -27,17 +27,17 @@ import java.nio.file.StandardOpenOption;
  */
 @ShellComponent
 public class ChunkRemove extends AbstractCommand {
-    private ChunkService chunkService = m_retrofit.create(ChunkService.class);
-    private String folderPath = "ChunkRemove" + File.separator;
-    private String currentDateTime;
-    private String chunkRemoveResponse;
-    private String errorMessage;
+    private ChunkService m_chunkService = m_retrofit.create(ChunkService.class);
+    private String m_folderPath = "ChunkRemove" + File.separator;
+    private String m_currentDateTime;
+    private String m_chunkRemoveResponse;
+    private String m_errorMessage;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
     /**
      * deletes a chunk
      *
-     * @param cid chunk which is deleted
+     * @param p_cid chunk which is deleted
      */
     @ShellMethod(value = "Remove chunk with chunk id <cid>.",
             group = "Chunk Commands")
@@ -48,11 +48,11 @@ public class ChunkRemove extends AbstractCommand {
             @Pattern(
                     regexp = CHUNK_REGEX,
                     message = "Regex Pattern: " + CHUNK_REGEX)
-                    String cid) {
-        long cidLong = ParsingCid.parse(cid);
-        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                m_rootPath + folderPath, false);
-        Call<Void> call = chunkService.chunkRemove(new ChunkRemoveRequest(cidLong));
+                    String p_cid) {
+        long cidLong = ParsingCid.parse(p_cid);
+        m_currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
+                m_rootPath + m_folderPath, false);
+        Call<Void> call = m_chunkService.chunkRemove(new ChunkRemoveRequest(cidLong));
         Response<Void> response = null;
         try {
             response = call.execute();
@@ -61,10 +61,10 @@ public class ChunkRemove extends AbstractCommand {
         }
         if (!response.isSuccessful()) {
             APIError error = ErrorUtils.parseError(response, m_retrofit);
-            errorMessage = error.getError();
+            m_errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            chunkRemoveResponse = "Chunk " + cid + " has been successfully removed";
+            m_chunkRemoveResponse = "Chunk " + p_cid + " has been successfully removed";
             saveSuccessfulResponse();
         }
     }
@@ -72,9 +72,9 @@ public class ChunkRemove extends AbstractCommand {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_errorMessage.getBytes(),
                     StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
@@ -85,9 +85,9 @@ public class ChunkRemove extends AbstractCommand {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, chunkRemoveResponse.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_chunkRemoveResponse.getBytes(),
                     StandardOpenOption.CREATE);
         } catch (IOException e) {
             e.printStackTrace();
@@ -98,6 +98,6 @@ public class ChunkRemove extends AbstractCommand {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + m_rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + m_folderPath + m_currentDateTime + "log.txt");
     }
 }

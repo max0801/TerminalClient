@@ -33,13 +33,13 @@ public class ChunkCreate extends AbstractCommand {
     private ChunkCreateResponse m_chunkCreateResponse;
     private String m_errorMessage;
     private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
-    private boolean print;
+    private boolean m_print;
 
     /**
      * creates a chunk on a specific node with a certain size
      * @param p_nid node where the chunk is created
      * @param p_size size of the created chunk
-     * @param print if true, prints the chunk id of the allocated chunk to stdout
+     * @param p_print if true, prints the chunk id of the allocated chunk to stdout
      */
     @ShellMethod(value = "Creates a chunk on node <nid> with size <size>.",
             group = "Chunk Commands")
@@ -60,8 +60,8 @@ public class ChunkCreate extends AbstractCommand {
                     value = {"--print", "-p"},
                     help = "prints chunk ID of the created chunk",
                     defaultValue = "false")
-                    boolean print) {
-        this.print = print;
+                    boolean p_print) {
+        this.m_print = p_print;
         m_currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
                 m_rootPath + m_folderPath, false);
         Call<ChunkCreateResponse> call = m_chunkService.chunkCreate(new ChunkCreateRequest(p_nid, p_size));
@@ -103,7 +103,7 @@ public class ChunkCreate extends AbstractCommand {
             Files.write(logFilePath,
                     Long.toHexString(m_chunkCreateResponse.getCid()).getBytes(),
                     StandardOpenOption.CREATE);
-            if(print){
+            if(m_print){
                 System.out.println(Long.toHexString(m_chunkCreateResponse.getCid()));
             }
         } catch (IOException e) {

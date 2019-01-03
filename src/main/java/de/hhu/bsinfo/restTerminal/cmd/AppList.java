@@ -25,13 +25,13 @@ import java.nio.file.StandardOpenOption;
  */
 @ShellComponent
 public class AppList extends AbstractCommand  {
-    private AppService appService = m_retrofit.create(AppService.class);
-    private String folderPath = "AppList" + File.separator;
-    private String currentDateTime;
-    private String onSuccessMessage;
-    private AppListResponse appListResponse;
-    private String errorMessage;
-    private boolean print;
+    private AppService m_appService = m_retrofit.create(AppService.class);
+    private String m_folderPath = "AppList" + File.separator;
+    private String m_currentDateTime;
+    private String m_onSuccessMessage;
+    private AppListResponse m_appListResponse;
+    private String m_errorMessage;
+    private boolean m_print;
 
     @ShellMethod(value = "Lists available applications of DXRAM.",
             group = "App Commands")
@@ -39,19 +39,19 @@ public class AppList extends AbstractCommand  {
     /**
      * prints the list of all dxram applications
      *
-     * @param print if true prints the applist to stdout
+     * @param p_print if true prints the applist to stdout
      *
      */
     public void applist(
             @ShellOption(
                     value = {"--print", "-p"},
                     help = "print applist to stdout", defaultValue = "false")
-                    boolean print) {
+                    boolean p_print) {
 
-        this.print = print;
-        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                m_rootPath + folderPath, true);
-        Call<AppListResponse> call = appService.appList();
+        this.m_print = p_print;
+        m_currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
+                m_rootPath + m_folderPath, true);
+        Call<AppListResponse> call = m_appService.appList();
         Response<AppListResponse> response = null;
         try {
             response = call.execute();
@@ -60,11 +60,11 @@ public class AppList extends AbstractCommand  {
         }
         if (!response.isSuccessful()) {
             APIError error = ErrorUtils.parseError(response, m_retrofit);
-            errorMessage = error.getError();
+            m_errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            onSuccessMessage = "AppList has been received";
-            appListResponse = response.body();
+            m_onSuccessMessage = "AppList has been received";
+            m_appListResponse = response.body();
             saveSuccessfulResponse();
         }
     }
@@ -72,9 +72,9 @@ public class AppList extends AbstractCommand  {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_errorMessage.getBytes(),
                     StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
@@ -86,13 +86,13 @@ public class AppList extends AbstractCommand  {
     public void saveSuccessfulResponse() {
         try {
             Path logFilePath = Paths.get(m_rootPath +
-                    folderPath + currentDateTime + "log.txt");
-            Files.write(logFilePath, onSuccessMessage.getBytes(),
+                    m_folderPath + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_onSuccessMessage.getBytes(),
                     StandardOpenOption.CREATE);
-            Path dataFilePath = Paths.get(m_rootPath + folderPath +
-                    currentDateTime + "response.txt");
-            for (String app : appListResponse.getApplist()) {
-                if(print){
+            Path dataFilePath = Paths.get(m_rootPath + m_folderPath +
+                    m_currentDateTime + "response.txt");
+            for (String app : m_appListResponse.getApplist()) {
+                if(m_print){
                     System.out.println(app);
                 }
                 Files.write(dataFilePath, app.getBytes(),
@@ -111,7 +111,7 @@ public class AppList extends AbstractCommand  {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + m_rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + m_folderPath + m_currentDateTime + "log.txt");
     }
 }
 

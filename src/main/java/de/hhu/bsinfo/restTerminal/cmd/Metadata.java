@@ -27,20 +27,19 @@ import java.nio.file.StandardOpenOption;
  */
 @ShellComponent
 public class Metadata extends AbstractCommand  {
-    private MetadataService metadataService = m_retrofit.create(MetadataService.class);
-    private String folderPath = "Metadata" + File.separator;
-    private String currentDateTime;
-    private MetadataResponseOnePeer metadataResponseOnePeer;
-    private MetadataResponseAllPeers metadataResponseAllPeers;
-    private String onSuccessMessage;
-    private String errorMessage;
-    private boolean allPeers = false;
-    private boolean print;
+    private MetadataService m_metadataService = m_retrofit.create(MetadataService.class);
+    private String m_folderPath = "Metadata" + File.separator;
+    private String m_currentDateTime;
+    private MetadataResponseOnePeer m_metadataResponseOnePeer;
+    private MetadataResponseAllPeers m_metadataResponseAllPeers;
+    private String m_onSuccessMessage;
+    private String m_errorMessage;
+    private boolean m_allPeers = false;
     private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
 
     /**
      * requests metadata from either one specific superpeer or from all superpeers
-     * @param nid specific superpeer (optional)
+     * @param p_nid specific superpeer (optional)
      */
     @ShellMethod(value = "Gets summary of all or one superpeer's metadata.",
             group = "Metadata Commands")
@@ -50,13 +49,13 @@ public class Metadata extends AbstractCommand  {
                     help = "Node <nid> where the metadata is requested from")
             @Pattern(regexp = NODE_REGEX,
                     message = "Regex Pattern: " + NODE_REGEX)
-                    String nid) {
+                    String p_nid) {
 
-        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                m_rootPath + folderPath, true);
-        if (nid.equals("0000")) {
-            allPeers = true;
-            Call<MetadataResponseAllPeers> allEntries = metadataService.metadataFromAllPeers();
+        m_currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
+                m_rootPath + m_folderPath, true);
+        if (p_nid.equals("0000")) {
+            m_allPeers = true;
+            Call<MetadataResponseAllPeers> allEntries = m_metadataService.metadataFromAllPeers();
             Response<MetadataResponseAllPeers> response = null;
             try {
                 response = allEntries.execute();
@@ -65,15 +64,15 @@ public class Metadata extends AbstractCommand  {
             }
             if (!response.isSuccessful()) {
                 APIError error = ErrorUtils.parseError(response, m_retrofit);
-                errorMessage = error.getError();
+                m_errorMessage = error.getError();
                 saveErrorResponse();
             } else {
-                onSuccessMessage = "Metadata of all superpeers has been received";
-                metadataResponseAllPeers = response.body();
+                m_onSuccessMessage = "Metadata of all superpeers has been received";
+                m_metadataResponseAllPeers = response.body();
                 saveSuccessfulResponse();
             }
         } else {
-            Call<MetadataResponseOnePeer> singleEntry = metadataService.metadataFromOnePeer(new MetadataRequest(nid));
+            Call<MetadataResponseOnePeer> singleEntry = m_metadataService.metadataFromOnePeer(new MetadataRequest(p_nid));
             Response<MetadataResponseOnePeer> response = null;
             try {
                 response = singleEntry.execute();
@@ -82,11 +81,11 @@ public class Metadata extends AbstractCommand  {
             }
             if (!response.isSuccessful()) {
                 APIError error = ErrorUtils.parseError(response, m_retrofit);
-                errorMessage = error.getError();
+                m_errorMessage = error.getError();
                 saveErrorResponse();
             } else {
-                onSuccessMessage = "Metadata of superpeer " + nid + " has been received";
-                metadataResponseOnePeer = response.body();
+                m_onSuccessMessage = "Metadata of superpeer " + p_nid + " has been received";
+                m_metadataResponseOnePeer = response.body();
                 saveSuccessfulResponse();
             }
         }
@@ -97,9 +96,9 @@ public class Metadata extends AbstractCommand  {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_errorMessage.getBytes(),
                     StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
@@ -110,26 +109,26 @@ public class Metadata extends AbstractCommand  {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, onSuccessMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_onSuccessMessage.getBytes(),
                     StandardOpenOption.CREATE);
 
-            if (allPeers) {
-                Path dataFilePath = Paths.get(m_rootPath + folderPath
-                        + currentDateTime + "response.txt");
-                for (MetadataResponseOnePeer entry : metadataResponseAllPeers.getMetadata()) {
+            if (m_allPeers) {
+                Path dataFilePath = Paths.get(m_rootPath + m_folderPath
+                        + m_currentDateTime + "response.txt");
+                for (MetadataResponseOnePeer entry : m_metadataResponseAllPeers.getMetadata()) {
                     Files.write(dataFilePath, ("nid: " + entry.getNid()).getBytes(),
                             StandardOpenOption.APPEND);
                     Files.write(dataFilePath, ("metadata: " + entry.getMetadata()).getBytes(),
                             StandardOpenOption.APPEND);
                 }
             } else {
-                Path dataFilePath = Paths.get(m_rootPath + folderPath
-                        + currentDateTime + "response.txt");
-                Files.write(dataFilePath, ("nid: " + metadataResponseOnePeer
+                Path dataFilePath = Paths.get(m_rootPath + m_folderPath
+                        + m_currentDateTime + "response.txt");
+                Files.write(dataFilePath, ("nid: " + m_metadataResponseOnePeer
                                 .getNid()).getBytes(), StandardOpenOption.APPEND);
-                Files.write(dataFilePath, ("metadata: " + metadataResponseOnePeer
+                Files.write(dataFilePath, ("metadata: " + m_metadataResponseOnePeer
                                 .getMetadata()).getBytes(), StandardOpenOption.APPEND);
             }
         } catch (IOException e) {
@@ -141,7 +140,7 @@ public class Metadata extends AbstractCommand  {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + m_rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + m_folderPath + m_currentDateTime + "log.txt");
 
     }
 }

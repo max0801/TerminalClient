@@ -26,18 +26,18 @@ import java.nio.file.StandardOpenOption;
  */
 @ShellComponent
 public class NameReg extends AbstractCommand {
-    private NameService nameService = m_retrofit.create(NameService.class);
-    private String folderPath = "NameReg" + File.separator;
-    private String currentDateTime;
-    private String nameRegResponse;
-    private String errorMessage;
+    private NameService m_nameService = m_retrofit.create(NameService.class);
+    private String m_folderPath = "NameReg" + File.separator;
+    private String m_currentDateTime;
+    private String m_nameRegResponse;
+    private String m_errorMessage;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
     /**
      * registers a name for a specific chunk in order to address it easier
      *
-     * @param cid  chunk
-     * @param name registered name for the chunk
+     * @param p_cid  chunk
+     * @param p_name registered name for the chunk
      */
     @ShellMethod(value = "Registers chunk <cid> with name <name>.",
             group = "Name Commands")
@@ -47,15 +47,15 @@ public class NameReg extends AbstractCommand {
             @Pattern(
                     regexp = CHUNK_REGEX,
                     message = "Regex Pattern: " + CHUNK_REGEX)
-                    String cid,
+                    String p_cid,
             @ShellOption(
                     value = {"--name", "-n"}, help = "name of the chunk")
-                    String name) {
-        long cidLong = ParsingCid.parse(cid);
+                    String p_name) {
+        long cidLong = ParsingCid.parse(p_cid);
 
-        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                m_rootPath + folderPath, false);
-        Call<Void> call = nameService.nameReg(new NameRegRequest(cidLong, name));
+        m_currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
+                m_rootPath + m_folderPath, false);
+        Call<Void> call = m_nameService.nameReg(new NameRegRequest(cidLong, p_name));
         Response<Void> response = null;
         try {
             response = call.execute();
@@ -64,10 +64,10 @@ public class NameReg extends AbstractCommand {
         }
         if (!response.isSuccessful()) {
             APIError error = ErrorUtils.parseError(response, m_retrofit);
-            errorMessage = error.getError();
+            m_errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            nameRegResponse = "Registered chunk " + cid + " as " + name;
+            m_nameRegResponse = "Registered chunk " + p_cid + " as " + p_name;
             saveSuccessfulResponse();
         }
     }
@@ -76,15 +76,15 @@ public class NameReg extends AbstractCommand {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + m_rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + m_folderPath + m_currentDateTime + "log.txt");
     }
 
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_errorMessage.getBytes(),
                     StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
@@ -95,9 +95,9 @@ public class NameReg extends AbstractCommand {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, nameRegResponse.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_nameRegResponse.getBytes(),
                     StandardOpenOption.CREATE);
             //Files.write(logFilePath, (" for the following chunk id: " + cid).getBytes(),
             //      StandardOpenOption.APPEND);

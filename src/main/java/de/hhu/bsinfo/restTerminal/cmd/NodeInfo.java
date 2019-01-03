@@ -26,17 +26,17 @@ import java.nio.file.StandardOpenOption;
  */
 @ShellComponent
 public class NodeInfo extends AbstractCommand {
-    private String folderPath = "NodeInfo" + File.separator;
-    private String currentDateTime;
-    private NodeInfoResponse nodeInfoResponse;
-    private String errorMessage;
-    private String onSuccessMessage;
-    private NodeService nodeService;
+    private String m_folderPath = "NodeInfo" + File.separator;
+    private String m_currentDateTime;
+    private NodeInfoResponse m_nodeInfoResponse;
+    private String m_errorMessage;
+    private String m_onSuccessMessage;
+    private NodeService m_nodeService;
     private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
 
     /**
      * requests information about a specific node
-     * @param nid node of which the information is requested
+     * @param p_nid node of which the information is requested
      */
     @ShellMethod(value = "Gets information about node <nid> in the network.",
             group = "Node Commands")
@@ -47,12 +47,12 @@ public class NodeInfo extends AbstractCommand {
             @Pattern(
                     regexp = NODE_REGEX,
                     message = "Regex Pattern: " + NODE_REGEX)
-                    String nid) {
+                    String p_nid) {
 
-        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                m_rootPath + folderPath, true);
-        nodeService = m_retrofit.create(NodeService.class);
-        Call<NodeInfoResponse> call = nodeService.nodeInfo(new NodeInfoRequest(nid));
+        m_currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
+                m_rootPath + m_folderPath, true);
+        m_nodeService = m_retrofit.create(NodeService.class);
+        Call<NodeInfoResponse> call = m_nodeService.nodeInfo(new NodeInfoRequest(p_nid));
         Response<NodeInfoResponse> response = null;
         try {
             response = call.execute();
@@ -61,11 +61,11 @@ public class NodeInfo extends AbstractCommand {
         }
         if (!response.isSuccessful()) {
             APIError error = ErrorUtils.parseError(response, m_retrofit);
-            errorMessage = error.getError();
+            m_errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            onSuccessMessage = "Nodeinfo of node " + nid + " has been received";
-            nodeInfoResponse = response.body();
+            m_onSuccessMessage = "Nodeinfo of node " + p_nid + " has been received";
+            m_nodeInfoResponse = response.body();
             saveSuccessfulResponse();
         }
     }
@@ -74,9 +74,9 @@ public class NodeInfo extends AbstractCommand {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_errorMessage.getBytes(),
                     StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
@@ -87,30 +87,27 @@ public class NodeInfo extends AbstractCommand {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, onSuccessMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_onSuccessMessage.getBytes(),
                     StandardOpenOption.CREATE);
 
-            Path dataFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "response.txt");
-//            Files.write(dataFilePath, ("NodeInfo of Node: " + nid
-//                    + System.lineSeparator()).getBytes(), StandardOpenOption.APPEND);
-
-            Files.write(dataFilePath, ("nid: " + nodeInfoResponse.getNid()).getBytes(),
+            Path dataFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "response.txt");
+            Files.write(dataFilePath, ("nid: " + m_nodeInfoResponse.getNid()).getBytes(),
                     StandardOpenOption.APPEND);
             Files.write(dataFilePath, System.lineSeparator().getBytes(),
                     StandardOpenOption.APPEND);
-            Files.write(dataFilePath, ("role: " + nodeInfoResponse.getRole()).getBytes(),
+            Files.write(dataFilePath, ("role: " + m_nodeInfoResponse.getRole()).getBytes(),
                     StandardOpenOption.APPEND);
             Files.write(dataFilePath, System.lineSeparator().getBytes(),
                     StandardOpenOption.APPEND);
-            Files.write(dataFilePath, ("address: " + nodeInfoResponse.getAddress()).getBytes(),
+            Files.write(dataFilePath, ("address: " + m_nodeInfoResponse.getAddress()).getBytes(),
                     StandardOpenOption.APPEND);
             Files.write(dataFilePath, System.lineSeparator().getBytes(),
                     StandardOpenOption.APPEND);
             Files.write(dataFilePath, ("capabilities: " +
-                    nodeInfoResponse.getCapabilities()).getBytes(), StandardOpenOption.APPEND);
+                    m_nodeInfoResponse.getCapabilities()).getBytes(), StandardOpenOption.APPEND);
             Files.write(dataFilePath, System.lineSeparator().getBytes(),
                     StandardOpenOption.APPEND);
         } catch (IOException e) {
@@ -123,6 +120,6 @@ public class NodeInfo extends AbstractCommand {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + m_rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + m_folderPath + m_currentDateTime + "log.txt");
     }
 }

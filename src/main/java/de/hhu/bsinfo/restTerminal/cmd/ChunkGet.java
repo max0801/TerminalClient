@@ -27,20 +27,20 @@ import java.nio.file.StandardOpenOption;
  */
 @ShellComponent
 public class ChunkGet extends AbstractCommand {
-    private ChunkService chunkService = m_retrofit.create(ChunkService.class);
-    private String folderPath = "ChunkGet" + File.separator;
-    private String currentDateTime;
-    private String onSuccessMessage;
-    private ChunkGetResponse chunkGetResponse;
-    private String errorMessage;
-    private boolean print;
+    private ChunkService m_chunkService = m_retrofit.create(ChunkService.class);
+    private String m_folderPath = "ChunkGet" + File.separator;
+    private String m_currentDateTime;
+    private String m_onSuccessMessage;
+    private ChunkGetResponse m_chunkGetResponse;
+    private String m_errorMessage;
+    private boolean m_print;
     private static final String CHUNK_REGEX = "(0x(.{16}?))|(.{16}?)";
 
     /**
      * requests the content of a chunk
-     * @param cid chunk which is requested
-     * @param type representation of the chunk response
-     * @param print if true, prints the content of chunk to stdout
+     * @param p_cid chunk which is requested
+     * @param p_type representation of the chunk response
+     * @param p_print if true, prints the content of chunk to stdout
      */
     @ShellMethod(value = "Requests a chunk with chunk id <cid> and type <type>.",
             group = "Chunk Commands")
@@ -51,23 +51,23 @@ public class ChunkGet extends AbstractCommand {
             @Pattern(
                     regexp = CHUNK_REGEX,
                     message = "Regex Pattern: " + CHUNK_REGEX)
-                    String cid,
+                    String p_cid,
             @ShellOption(
                     value = {"--type", "-t"}, defaultValue = "str",
                     help = "type of the requested chunk [str,byte,short,int,long]")
             @Pattern(
                     regexp = "str|long|int|byte|short",
                     message = "Supported datatypes: str,byte,short,int,long")
-                    String type,
+                    String p_type,
             @ShellOption(
                     value = {"--print", "-p"}, help = "print chunk to stdout",
-                    defaultValue = "false") boolean print) {
+                    defaultValue = "false") boolean p_print) {
 
-        this.print = print;
-        long cidLong = ParsingCid.parse(cid);
-        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                m_rootPath + folderPath, true);
-        Call<ChunkGetResponse> call = chunkService.chunkGet(new ChunkGetRequest(cidLong, type));
+        this.m_print = p_print;
+        long cidLong = ParsingCid.parse(p_cid);
+        m_currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
+                m_rootPath + m_folderPath, true);
+        Call<ChunkGetResponse> call = m_chunkService.chunkGet(new ChunkGetRequest(cidLong, p_type));
         Response<ChunkGetResponse> response = null;
         try {
             response = call.execute();
@@ -76,11 +76,11 @@ public class ChunkGet extends AbstractCommand {
         }
         if (!response.isSuccessful()) {
             APIError error = ErrorUtils.parseError(response, m_retrofit);
-            errorMessage = error.getError();
+            m_errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            onSuccessMessage = "Received chunk  " + cid + " with type " + type + "";
-            chunkGetResponse = response.body();
+            m_onSuccessMessage = "Received chunk  " + p_cid + " with p_type " + p_type + "";
+            m_chunkGetResponse = response.body();
             saveSuccessfulResponse();
         }
     }
@@ -88,9 +88,9 @@ public class ChunkGet extends AbstractCommand {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_errorMessage.getBytes(),
                     StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
@@ -101,16 +101,16 @@ public class ChunkGet extends AbstractCommand {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, onSuccessMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_onSuccessMessage.getBytes(),
                     StandardOpenOption.CREATE);
-            Path dataFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "response.txt");
-            Files.write(dataFilePath, String.valueOf(chunkGetResponse.getContent()).getBytes(),
+            Path dataFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "response.txt");
+            Files.write(dataFilePath, String.valueOf(m_chunkGetResponse.getContent()).getBytes(),
                     StandardOpenOption.CREATE);
-            if (print) {
-                System.out.println("Content of Chunk: " + chunkGetResponse.getContent());
+            if (m_print) {
+                System.out.println("Content of Chunk: " + m_chunkGetResponse.getContent());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -121,7 +121,7 @@ public class ChunkGet extends AbstractCommand {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + m_rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + m_folderPath + m_currentDateTime + "log.txt");
     }
 }
 

@@ -27,16 +27,16 @@ import javax.validation.constraints.Positive;
  */
 @ShellComponent
 public class StatsPrint extends AbstractCommand  {
-    private StatsService statsService = m_retrofit.create(StatsService.class);
-    private String currentDateTime;
-    private StatsPrintResponse statsPrintResponse;
-    private String errorMessage;
-    private String onSuccessMessage;
-    private String folderPath = "StatsPrint" + File.separator;
+    private StatsService m_statsService = m_retrofit.create(StatsService.class);
+    private String m_currentDateTime;
+    private StatsPrintResponse m_statsPrintResponse;
+    private String m_errorMessage;
+    private String m_onSuccessMessage;
+    private String m_folderPath = "StatsPrint" + File.separator;
 
     /**
      * shows dxram statistics in a browser window
-     * @param interval refresh interval parameter
+     * @param p_interval refresh interval parameter
      */
     @ShellMethod(value = "Gets debug information every <interval> seconds.",
             group = "Statistics Commands")
@@ -44,12 +44,12 @@ public class StatsPrint extends AbstractCommand  {
             @ShellOption(
                     value = {"--interval", "-i"}, defaultValue = "10",
                     help = "Refresh interval parameter in seconds")
-                    @Positive int interval) {
+                    @Positive int p_interval) {
 
-        String stringInterval = String.valueOf(interval);
-        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                m_rootPath + folderPath, false);
-        Call<StatsPrintResponse> call = statsService.printStats(new StatsPrintRequest(stringInterval));
+        String stringInterval = String.valueOf(p_interval);
+        m_currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
+                m_rootPath + m_folderPath, false);
+        Call<StatsPrintResponse> call = m_statsService.printStats(new StatsPrintRequest(stringInterval));
         Response<StatsPrintResponse> response = null;
         try {
             response = call.execute();
@@ -64,11 +64,11 @@ public class StatsPrint extends AbstractCommand  {
                 p_e.printStackTrace();
             }
             APIError error = ErrorUtils.parseError(response, m_retrofit);
-            errorMessage = error.getError();
+            m_errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            onSuccessMessage = "Statistics are printed every " + interval + " seconds";
-            statsPrintResponse = response.body();
+            m_onSuccessMessage = "Statistics are printed every " + p_interval + " seconds";
+            m_statsPrintResponse = response.body();
             saveSuccessfulResponse();
         }
     }
@@ -76,9 +76,9 @@ public class StatsPrint extends AbstractCommand  {
     @Override
     public void saveErrorResponse() {
         try {
-            File file = new File(m_rootPath + folderPath
-                    + currentDateTime + "error.html");
-            Files.write(file.toPath(), errorMessage.getBytes());
+            File file = new File(m_rootPath + m_folderPath
+                    + m_currentDateTime + "error.html");
+            Files.write(file.toPath(), m_errorMessage.getBytes());
             Desktop.getDesktop().browse(file.toURI());
             printErrorToTerminal();
         } catch (IOException e) {
@@ -89,13 +89,13 @@ public class StatsPrint extends AbstractCommand  {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, onSuccessMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_onSuccessMessage.getBytes(),
                     StandardOpenOption.CREATE);
-            File file = new File(m_rootPath + folderPath
-                    + currentDateTime + "response.html");
-            Files.write(file.toPath(), statsPrintResponse.getHtmlResponse().getBytes());
+            File file = new File(m_rootPath + m_folderPath
+                    + m_currentDateTime + "response.html");
+            Files.write(file.toPath(), m_statsPrintResponse.getHtmlResponse().getBytes());
             Desktop.getDesktop().browse(file.toURI());
         } catch (IOException e) {
             e.printStackTrace();
@@ -106,7 +106,7 @@ public class StatsPrint extends AbstractCommand  {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + m_rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + m_folderPath + m_currentDateTime + "log.txt");
     }
 }
 

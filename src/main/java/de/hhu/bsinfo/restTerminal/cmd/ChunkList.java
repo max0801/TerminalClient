@@ -26,19 +26,19 @@ import java.nio.file.StandardOpenOption;
  */
 @ShellComponent
 public class ChunkList extends AbstractCommand {
-    private ChunkService chunkService = m_retrofit.create(ChunkService.class);
-    private String currentDateTime;
-    private ChunkListResponse chunkListResponse;
-    private String errorMessage;
-    private String onSuccessMessage;
-    private String folderPath = "ChunkList" + File.separator;
-    private boolean print;
+    private ChunkService m_chunkService = m_retrofit.create(ChunkService.class);
+    private String m_currentDateTime;
+    private ChunkListResponse m_chunkListResponse;
+    private String m_errorMessage;
+    private String m_onSuccessMessage;
+    private String m_folderPath = "ChunkList" + File.separator;
+    private boolean m_print;
     private static final String NODE_REGEX = "(0x(.{4}?))|(.{4}?)";
 
     /**
      * requests the list of all registered chunks on a specific node
-     * @param nid node to which the chunklist is referring to
-     * @param print if true, prints list of all chunks to stdout
+     * @param p_nid node to which the chunklist is referring to
+     * @param p_print if true, prints list of all chunks to stdout
      */
     @ShellMethod(value = "Lists all chunks on node <nid>.",
             group = "Chunk Commands")
@@ -48,16 +48,16 @@ public class ChunkList extends AbstractCommand {
                     help = "The node <nid> where the list of chunks is referring to")
             @Pattern(
                     regexp = NODE_REGEX,
-                    message = "Regex Pattern: " + NODE_REGEX) String nid,
+                    message = "Regex Pattern: " + NODE_REGEX) String p_nid,
             @ShellOption(
                     value = {"--print", "-p"},
                     help = "print chunklist to stdout", defaultValue = "false")
-                    boolean print) {
+                    boolean p_print) {
 
-        this.print = print;
-        currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
-                m_rootPath + folderPath, true);
-        Call<ChunkListResponse> call = chunkService.chunkList(new ChunkListRequest(nid));
+        this.m_print = p_print;
+        m_currentDateTime = FolderHierarchy.createDateTimeFolderHierarchy(
+                m_rootPath + m_folderPath, true);
+        Call<ChunkListResponse> call = m_chunkService.chunkList(new ChunkListRequest(p_nid));
         Response<ChunkListResponse> response = null;
         try {
             response = call.execute();
@@ -66,11 +66,11 @@ public class ChunkList extends AbstractCommand {
         }
         if (!response.isSuccessful()) {
             APIError error = ErrorUtils.parseError(response, m_retrofit);
-            errorMessage = error.getError();
+            m_errorMessage = error.getError();
             saveErrorResponse();
         } else {
-            onSuccessMessage = "Chunklist of node " + nid + " has been received";
-            chunkListResponse = response.body();
+            m_onSuccessMessage = "Chunklist of node " + p_nid + " has been received";
+            m_chunkListResponse = response.body();
             saveSuccessfulResponse();
         }
     }
@@ -78,9 +78,9 @@ public class ChunkList extends AbstractCommand {
     @Override
     public void saveErrorResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, errorMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_errorMessage.getBytes(),
                     StandardOpenOption.CREATE);
             printErrorToTerminal();
         } catch (IOException e) {
@@ -91,23 +91,23 @@ public class ChunkList extends AbstractCommand {
     @Override
     public void saveSuccessfulResponse() {
         try {
-            Path logFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "log.txt");
-            Files.write(logFilePath, onSuccessMessage.getBytes(),
+            Path logFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "log.txt");
+            Files.write(logFilePath, m_onSuccessMessage.getBytes(),
                     StandardOpenOption.CREATE);
-            Path dataFilePath = Paths.get(m_rootPath + folderPath
-                    + currentDateTime + "response.txt");
-            Files.write(dataFilePath, chunkListResponse.getLocalChunkRanges().getBytes(),
+            Path dataFilePath = Paths.get(m_rootPath + m_folderPath
+                    + m_currentDateTime + "response.txt");
+            Files.write(dataFilePath, m_chunkListResponse.getLocalChunkRanges().getBytes(),
                     StandardOpenOption.APPEND);
             Files.write(dataFilePath, System.lineSeparator().getBytes(),
                     StandardOpenOption.APPEND);
-            Files.write(dataFilePath, chunkListResponse.getMigratedChunkRanges().getBytes(),
+            Files.write(dataFilePath, m_chunkListResponse.getMigratedChunkRanges().getBytes(),
                     StandardOpenOption.APPEND);
-            if (print) {
+            if (m_print) {
                 System.out.println("Local Chunk Ranges: "
-                        + chunkListResponse.getLocalChunkRanges());
+                        + m_chunkListResponse.getLocalChunkRanges());
                 System.out.println("Migrated Chunk Ranges: "
-                        + chunkListResponse.getMigratedChunkRanges());
+                        + m_chunkListResponse.getMigratedChunkRanges());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -119,7 +119,7 @@ public class ChunkList extends AbstractCommand {
     public void printErrorToTerminal() {
         System.out.println("ERROR");
         System.out.println("Please check out the following file: "
-                + m_rootPath + folderPath + currentDateTime + "log.txt");
+                + m_rootPath + m_folderPath + m_currentDateTime + "log.txt");
     }
 }
 
